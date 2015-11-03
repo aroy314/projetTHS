@@ -1,0 +1,63 @@
+avantages matlab / octave : 
+	langage vectoriel
+	si ne marche pas, c'est dû à l'idee, pas au code
+
+Deroulement du projet {
+	- compression d'une image (JPEG ancienne géné)
+	- compression d'une sequence
+	- multi-resolution (JPEG nouvelle géné)
+}
+
+Fonctionnement de la compression d'une image RGB {
+
+(Multirésolution : création d'une donnée basse frequence avec des informations de déploiement sur une taille NxN)
+
+- Compression à perte : 
+	- transformation dans une base donnée (fourier, base des ondelettes?) 
+	c.f. Base de transformation
+	- seuillage par matrice de quantification en fct du taux de compression 
+(faible ponderation des coef à basse freq, haute ponderation des hautes frequences)
+
+- transformation en matrice
+- lecture en diagonale zigzag -> transformation image NxN en vecteur 1xN^2
+
+Compression sans perte du vecteur
+}
+
+Fonctionnement compression d'une sequence {
+
+difference entre deux images, application de la difference sur le vecteur 
+fixation de deux taux de compression (un pour la premiere image de tres bonne qualité, ensuite un plus puissant)
+}
+
+Base de transformation {
+	idée 1 : série de fourier
+		probleme : bn liés à la partie impaire du signal
+		-> phénomène de Gibbs -> deformation de l'image
+
+	idée 2 : plus de bn en redant la fct symetrique
+		-> plus de phenomene de Gibbs
+		on obtient des séries de cosinus qui donnent lieu à la Discrete Cosine Transform
+
+		En 2D : on crée une matrice que l'on transpose. c.f. formule (Idct = P*I*P^-1)
+		P et P^-1 à calculer et garder dans un coin
+		-> on morcelle en matrices 8x8 avant 
+}
+
+En résumé {
+	RGB de taille NxN
+	morcelé en 8x8 (si pas multiple on complete avec des zéros)
+	for(toutes les 8x8){
+		DCT 2D()
+		Quantification() + zigzag()
+	}
+}
+
+Quantification(){
+	Iquant = round(I/Q)
+	avec Q(k,l) = 1+(k+l+1)*q
+	q = parametre de compression
+}
+
+Jim Blinn
+What's the deal with the DCT
