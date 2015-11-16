@@ -7,7 +7,7 @@
 //
 
 #include <iostream>
-#include "image.hpp"
+#include "image.cpp"
 
 using namespace std;
 
@@ -16,6 +16,10 @@ int main(int argc, const char * argv[]) {
     //allocation de l'objet image
         //le constructeur charge l'img et alloue les 3 matrices
     Image *image = new Image(argv);
+    
+    image->traitement();
+    
+    image->zigzag();
     
     //lancement de la conversion
         //division en matrices 8x8 et pour chacune :
