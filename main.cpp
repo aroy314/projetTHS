@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include "image.hpp"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ int main(int argc, const char * argv[]) {
             //réécriture dans la matrice NxN
     
         //ZigZag de la matrice NxN pour obtenir vecteur N^2
-    
+    cout << "Hello World !\n" ;
     
     return 0;
 }
