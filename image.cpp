@@ -20,13 +20,9 @@ class Image {
     int **R;//two dimension matrix
     int **G;
     int **B;
-    int *Vecteur;//Final 1D Vector
+    int **Vecteurs;//Final 1D Vector
     int **Matrice8x8;//8x8 matrix we work with
     int **Q;//quantification matrix
-
-    void dct_2D(){//dosda
-        
-    }
     
     void initQ(int q) { // Création de la matrice de quantification
         int k,l;
@@ -55,12 +51,12 @@ class Image {
     
     
     
-    
-    void dct_2D_V1(int **Matrice8x8)
+    public :
+    void dct_2D(int **Matrice8x8)
     {
-        int **Matrice_dct = new int*[8];
+        float **Matrice_dct = new float*[8];
         for (int i = 0; i < 8; i++)
-            Matrice_dct[i] = new int[8];
+            Matrice_dct[i] = new float[8];
         
         float Ci;
         float Cj;
@@ -86,33 +82,36 @@ class Image {
         
         for (int i=0; i<8; i++)
             for (int j=0; j<8; j++)
-                Matrice8x8[i][j]=Matrice_dct[i][j];
+            {
+                if()
+                    Matrice8x8[i][j]=Matrice_dct[i][j];
+            }
         
         
     }
     
     
     
-    public :
-    Image(const char * nom_image[]){ //CONSTRUCTEUR
-        
-        //allocation
-/*
-        exemple d'allocation de tableau 2D
-        int **R = new int*[8];
-        for (int i = 0; i < 8; i++)
-            Matrice[i] = new int[8];
-        */
-        
-        //charge_img() et allocation RGB
-        //calcul de Q
-        int q;
-        std::cout << "Entrez le paramètre de compression : ";
-        std::cin >> q;
-        initQ(q);
-        
-        std::cout << "construction faite\n";
-    }
+//    public :
+//    Image(const char * nom_image[]){ //CONSTRUCTEUR
+//        
+//        //allocation
+///*
+//        exemple d'allocation de tableau 2D
+//        int **R = new int*[8];
+//        for (int i = 0; i < 8; i++)
+//            Matrice[i] = new int[8];
+//        */
+//        
+//        //charge_img() et allocation RGB
+//        //calcul de Q
+//        int q;
+//        std::cout << "Entrez le paramètre de compression : ";
+//        std::cin >> q;
+//        initQ(q);
+//        
+//        std::cout << "construction faite\n";
+//    }
     
     void traitement(){
         //pour R :
@@ -135,6 +134,22 @@ class Image {
     void zigzag(){//poisson
         //lecture de la NN image
         //ecriture de Vecteur avec la lecture en zigzag
+        
+        std::cout << "ZigZag fait\n";
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    void EcritureFinal_jpg(int *Vecteur){//Dosda
+        //Ecriture fichier en jpg
+        
+        
+        
         
         std::cout << "ZigZag fait\n";
         
