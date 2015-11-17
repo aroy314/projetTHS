@@ -1,3 +1,4 @@
+
 # Explications Projet THS
 
 ## Compression d'images
@@ -21,9 +22,6 @@ On filtre les informations grace à la transformee en cosinus qui donne accès a
 #### Quantification 
 
 On va diminuer la precision des frequences elevees, en divisant chaque element DCT par l’element correspondant.
-
-
-
 
 
 
