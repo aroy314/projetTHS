@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include "image.hpp"
+#include <math.h>
 
 //using namespace std;
 
@@ -22,10 +23,6 @@ class Image {
     int *Vecteur = NULL;    //Final 1D Vector
     int **Matrice8x8 = NULL;//8x8 matrix we work with
     int **Q = NULL;         //quantification matrix
-
-    void dct_2D(){//dosda
-        
-    }
     
     void initQ(int q) { // Création de la matrice de quantification
         int k,l;
@@ -51,6 +48,43 @@ class Image {
     void charge_img(const char * nom_image[], int *taille){
         //lecture du fichier et attribution dans image NN
     }
+    
+	
+    void dct_2D_V1(int **Matrice8x8)
+    {
+        int **Matrice_dct = new int*[8];
+        for (int i = 0; i < 8; i++)
+            Matrice_dct[i] = new int[8];
+        
+        float Ci;
+        float Cj;
+        
+        for (int i=0; i<8; i++)
+            for (int j=0; j<8; j++)
+            {    Matrice_dct[i][j] = 0;
+                for (int x=0; x<8; x++)
+                    for (int y=0; y<8; y++)
+                    {
+                        if (i==0)
+                            Ci=1/sqrt(2);
+                        else Ci=1;
+                        
+                        if (j==0)
+                            Cj=1/sqrt(2);
+                        else Cj=1;
+                        
+                        Matrice_dct[i][j]+=Matrice8x8[x][y]*(Ci*Cj)/4*cos(((2*x+1)*i*M_PI)/16)*cos(((2*y+1)*j*M_PI)/16);
+                    }
+                
+            }
+        
+        for (int i=0; i<8; i++)
+            for (int j=0; j<8; j++)
+                Matrice8x8[i][j]=Matrice_dct[i][j];
+        
+    }
+    
+    
     
     public :
     Image(const char * nom_image[]){ //CONSTRUCTEUR
@@ -135,6 +169,7 @@ class Image {
         std::cout << "traitement fait\n";
         
     }
+	
     void zigzag(){//poisson
         //lecture de la NN image
         //ecriture de Vecteur avec la lecture en zigzag
@@ -143,4 +178,5 @@ class Image {
         
     }
     
+
 };

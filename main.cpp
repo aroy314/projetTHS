@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <math.h>
 #include "image.cpp"
 
 using namespace std;
@@ -30,6 +31,34 @@ int main(int argc, const char * argv[]) {
         //ZigZag de la matrice NxN pour obtenir vecteur N^2
     cout << "fin du traitement\n" ;
     delete image;
+    
+    int a=1;
+    int **Matrice = new int*[8];
+    for (int i = 0; i < 8; i++)
+        Matrice[i] = new int[8];
+    
+    Image* image= new Image();
+    
+    
+    for (int i=0; i<8; i++)
+        for (int j=0; j<8; j++)
+            Matrice[i][j]=((i+a));
+    
+    
+    image->dct_2D_V1(Matrice);
+    
+    
+    for (int i=0; i<8; i++)
+        for (int j=0; j<8; j++)
+        {
+            printf("%d ", Matrice[i][j]);
+            if(j==7)
+            {
+                printf("\n");
+            }
+            
+        }
+    
     
     return 0;
 }
