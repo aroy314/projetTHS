@@ -47,6 +47,15 @@ class Image {
         cout << "quantification faite\n";
     }
     
+        // Application de la phase de quantification inverse sur chacune des matrices
+    void Quantification_inv(int ** Obj) {					   // on récupère notre matrice 8x8
+        int k,l;
+        for(k=0;k<8;k++)					 // parcourt lignes
+            for (l=0;l<8;l++)				// parcourt colonnes
+                Obj[k][l] = Obj[k][l]*this->Q[k][l];    // multiplie notre matrice 8x8 par l'objet Q, membre à membre
+        std::cout << "quantification inverse faite\n";
+    }
+    
     void charge_img(const char * nom_image[], int *taille){
         //lecture du fichier et attribution dans image NN, et envoi de la taille dans *taille
 		cout << "image chargée \n";
