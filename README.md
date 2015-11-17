@@ -9,8 +9,6 @@ L’image JPEG est chargee dans un objet X qui comporte une matrice de pointeurs
 On considere une matrice NxN dont le nombre de lignes et de colones est un multiple de 8.
 Si l'image n'est pas décomposable en blocs de 8x8, on complète la matrice de 0 à la fin de chaque ligne et chaque colonne.
 
-![GitHub Logo](/images/Complet0.jpg)
-Format: ![Alt Text](https://github.com/aroy314/projetTHS/)
 
 ###Deuxieme etape : Recuperation RGB
 
@@ -31,8 +29,5 @@ On va diminuer la precision des frequences elevees, en divisant chaque element D
 
 La methode Zigzag permet de regrouper les eleéments, en suite d'octets et effectuer une linearisation. Elle nous permet d'ecrire la matrice dans un fichier.
 
-
-![GitHub Logo](/images/zigzag.jpg)
-Format: ![Alt Text](https://github.com/aroy314/projetTHS/)
 
 
