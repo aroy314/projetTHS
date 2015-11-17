@@ -16,6 +16,11 @@ int main(int argc, const char * argv[]) {
     
     //allocation de l'objet image
         //le constructeur charge l'img et alloue les 3 matrices
+    Image *image = new Image(argv);
+    
+    image->traitement();
+    
+    image->zigzag();
     
     //lancement de la conversion
         //division en matrices 8x8 et pour chacune :
@@ -24,7 +29,8 @@ int main(int argc, const char * argv[]) {
             //réécriture dans la matrice NxN
     
         //ZigZag de la matrice NxN pour obtenir vecteur N^2
-    
+    cout << "fin du traitement\n" ;
+    delete image;
     
     int a=1;
     int **Matrice = new int*[8];
@@ -53,8 +59,6 @@ int main(int argc, const char * argv[]) {
             
         }
     
-    
-            
     
     return 0;
 }
