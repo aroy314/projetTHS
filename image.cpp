@@ -67,27 +67,23 @@ class Image {
                 for (int x=0; x<8; x++)
                     for (int y=0; y<8; y++)
                     {
-                        if (i==0)
-                            Ci=1/sqrt(2);
-                        else Ci=1;
-                        
-                        if (j==0)
-                            Cj=1/sqrt(2);
-                        else Cj=1;
+                        (i==0) ? Ci=1/sqrt(2): Ci=1;
+                        (j==0) ? Cj=1/sqrt(2): Cj=1;
                         
                         Matrice_dct[i][j]+=Matrice8x8[x][y]*(Ci*Cj)/4*cos(((2*x+1)*i*M_PI)/16)*cos(((2*y+1)*j*M_PI)/16);
                     }
-                
             }
         
-        for (int i=0; i<8; i++)
+        for (int i=0; i<8; i++)//arondicement des valeurs
             for (int j=0; j<8; j++)
             {
-                if()
+                if(Matrice_dct[i][j]>0)
+                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
+                        Matrice8x8[i][j]=Matrice_dct[i][j];
+                else
+                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>-0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
                     Matrice8x8[i][j]=Matrice_dct[i][j];
             }
-        
-        
     }
     
     
