@@ -323,7 +323,7 @@ class Image {
         
     }
     
-<<<<<<< HEAD
+
     void zigzag_inverse (int * linea, int ** Obj) {
 
 int pos;	
@@ -368,8 +368,7 @@ while ((k!=7)||(l!=7))			// tant qu'on n'est pas arrivé au dernier élément de
 Obj[k][l]=linea[pos];
 
 }
-=======
-	
+
 	void zigzag_inverse(int **Matrice8x8, int *Vect){//poisson
 		//lecture du vecteur compressé
 		//ecriture d'une matrice 88
@@ -385,7 +384,7 @@ Obj[k][l]=linea[pos];
 	void decompression_zigzag(int *V1, int* V2){
 		
 	}
->>>>>>> 2d11dce6df2e6dc3fb56cb13aeec392bba661e88
+
 
 };
 
