@@ -24,7 +24,34 @@ int* Dimensions(CImg<int> image){ //Pour calculer les dimensions de l'image
 	return tab;
 }
 
-CImg<int> ResizeX(CImg<int> image) { //Redimension si dimx < dimy
+int** MiseEnMatrice(CImg<int> image, int** matrice){
+	int size = image.dimx()>image.dimy()? image.dimx():image.dimy();
+	
+	matrice = new int*[size*3];		//Création matrice
+	for(int i=0; i<size*3; i++)
+		matrice[i] = new int[size*3];
+	
+	for (int i=0; i<size*3; i++)		//Initialistation à 0
+		for (int j=0; j<size*3; j++)
+			matrice[i][j]=0;
+
+	for (int i=0; i<image.dimx(); i=i+3){	//Remplissage matrice
+		for (int j=0; j<image.dimy(); j++){
+			matrice[i][j]=image(i,j,0,0);
+			matrice[i+1][j]=image(i,j,0,1);
+			matrice[i+2][j]=image(i,j,0,2);
+		}
+	}
+	return matrice;
+}
+
+/*void Free_Tab(){
+	for (int i=0; i<10000; i++)
+		delete[] matrice[i];
+	delete[] matrice;
+}*/
+
+/*CImg<int> ResizeX(CImg<int> image) { //Redimension si dimx < dimy
 	CImg<int> newImage(image.dimy(), image.dimy(), 1, 3, 0);
 	for (int i = 0; i < image.dimx(); i++) {
 		for (int j = 0; j < image.dimy(); j++) {
@@ -46,40 +73,37 @@ CImg<int> ResizeY(CImg<int> image) { //Redimension si dimx > dimy
 			}
 		}
 	return newImage;
-}
+}*/
 
 
 int main() 
 {	
 	CImg<int> image;
- 	image = charge_img("lena.jpg");
+	int** matrice;
+
+	image = charge_img("lena.jpg");
 	int* tab = Dimensions(image);
 	cout << "X = " << tab[0] << endl << "Y = " << tab[1] << endl;
 	delete tab;
-	
-	if(image.dimx() < image.dimy());
-	image = ResizeX(image);
-	if(image.dimx() > image.dimy());
-	image = ResizeY(image);
-	
-	int* newtab = Dimensions(image);
-	cout << "X = " << newtab[0] << endl << "Y = " << newtab[1] << endl;
-	delete newtab;
+
+	matrice = MiseEnMatrice(image, matrice);
 
 /*	for (int i = 0; i < image.dimx(); i++) {
 		for (int j = 0; j < image.dimy(); j++) {
-			for (int k = 1; k < 2; k++) {
-				image(i,j,0,k)=0;
+			cout << endl;
+			for (int k = 0; k < image.dimv(); k++) {
+			cout << image(i,j,0,k);
 				}}}
 
 
 	for (int i = 0; i < image.dimx(); i++){
 		for (int j = 0; j < image.dimy(); j++){
+			cout << matrice[i][j];
+			cout << matrice[i+1][j];
+			cout << matrice[i+2][j];
 			cout << endl;
-			for (int k = 0; k < 3; k++){
-				cout << image(i,j,0,k);
-			}}}
-*/	
+			}}
+*/
 	save_img(image, "out.jpg");
 	
 
