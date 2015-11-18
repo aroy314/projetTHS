@@ -18,11 +18,26 @@ void save_img(CImg <int> image, const char* file) {
 }
 
 int* Dimensions(CImg<int> image){
-	int* tab = new int[1];
+	int* tab = new int[2];
 	tab[0] = image.dimx();
 	tab[1] = image.dimy();
 	return tab;
 }
+
+/*CImg<int> Resize(CImg<int> image) {
+	if (image.dimx()<image.dimy())
+	{
+	for (int i = image.dimx(); i < image.dimy(); i++) {
+		for (int j = 0; j < image.dimy(); j++) {
+			for (int k = 0; k < image.dimv(); k++) {
+				image(i,j,0,k)=0;
+				}
+			}
+		}
+	}
+	return image;
+}*/
+
 
 int main() 
 {	
@@ -30,6 +45,24 @@ int main()
  	image = charge_img("lena.jpg");
 	int* tab = Dimensions(image);
 	cout << "X = " << tab[0] << endl << "Y = " << tab[1] << endl;
+	delete tab;
+//	image = Resize(image);
+	
+	CImg<int> image2(image.dimy(),image.dimy(), 1, 3, 0);
+	if (image.dimx()<image.dimy())
+	{
+	for (int i = 0; i < image.dimx(); i++) {
+		for (int j = 0; j < image.dimy(); j++) {
+			for (int k = 0; k < image.dimv(); k++) {
+				image2(i,j,0,k) = image(i,j,0,k);
+				}
+			}
+		}
+	}
+	
+	int* newtab = Dimensions(image);
+	cout << "X = " << newtab[0] << endl << "Y = " << newtab[1] << endl;
+	delete newtab;
 
 /*	for (int i = 0; i < image.dimx(); i++) {
 		for (int j = 0; j < image.dimy(); j++) {
@@ -44,9 +77,8 @@ int main()
 			for (int k = 0; k < 3; k++){
 				cout << image(i,j,0,k);
 			}}}
-*/
-
-		
+*/	
+	save_img(image2, "black.jpg");
 	save_img(image, "out.jpg");
 	
 
