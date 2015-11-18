@@ -72,7 +72,7 @@ class Image {
     void dct_2D(int **Matrice8x8){
 		
 		//allocation d'une matrice de travail
-        int **Matrice_dct = new int*[8];
+        float **Matrice_dct = new float*[8];
         for (int i = 0; i < 8; i++)
             Matrice_dct[i] = new float[8];
         
@@ -157,14 +157,77 @@ class Image {
 		cout << "DCT2D faite\n";
 
     }
-
+    
+    
+    void separate_RGB(int **image, int N, int **R, int **G,int **B)
+    {
+        
+        for(int i=0; i<(N);i++)
+           for(int j=0; j<(N);j++)
+            {
+                R[i][j]=image[i][j*3];
+                G[i][j]=image[i][j*3+1];
+                B[i][j]=image[i][j*3+2];
+            }
+        
+        
+    }
+    
+    
     
     
     public :
+    
+    int compression_zigzag (int * linea, int * comp)
+    {
+        
+        int x=0;
+        int a = 1;
+        
+        for (int pos=0; pos<64 ; pos++)
+        {
+            
+            if  (linea[pos+1]==linea[pos])
+            {   a++;}
+            else
+            {
+                comp[x] = a ;
+                comp[x+1] =linea[pos];
+                a = 1 ;
+                x = x + 2;
+            }
+        }
+        
+    
+        
+        for (int i=128-x; i<128 ;i++)
+        {
+            comp[i]=0;
+            printf("%d ",comp[i]);
+        }
+        
+        
+        x=x-1;
+        x=128-x;
+        
+        
+        return x;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
     Image(const char * nom_image[]){ //CONSTRUCTEUR
 		
 		//chargement de l'image et attribution de la taille de la matrice NN
-		charge_img(nom_image,&this->taille);
+		//charge_img(nom_image,&this->taille);
 		
         //allocation des attributs
         this->image = new int *[3*this->taille];
@@ -265,7 +328,7 @@ class Image {
 		int position = 0;
 		int *Vect_temp = new int[128];
 		zigzag(this->Matrice8x8, Vect_temp);
-		compression_zigzag(Vect_temp,this->Vecteur128,&position);
+//--------//compression_zigzag(Vect_temp,this->Vecteur128,&position);
 		delete Vect_temp;
 		
 		//suppression des 0 et raccourcissement du vecteur de taille size
@@ -332,9 +395,9 @@ class Image {
 		
 	}
 	
-	void compression_zigzag(int *V1, int* V2, int *position){//V1 vecteur non compressé, V2 vecteur non compressé, position = nombre de cases
+	//void compression_zigzag(int *V1, int* V2, int *position){//V1 vecteur non compressé, V2 vecteur non compressé, position = nombre de cases
 		
-	}
+	//}
 	
 	void decompression_zigzag(int *V1, int* V2){
 		
