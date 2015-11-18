@@ -126,7 +126,7 @@ class Image {
 		suppression_zeros(this->Vecteur128, Vect_out, &nbOut);//nbOut doit réduire de 2 si on enlève les 0
 		//on a le resultat final dans Vect_out
 		
-		//on concatène Vecteur out au bout de VecteursR/G/B
+		//on concatène Vecteur out au bout de VecteursR/G/B, précédé d'un marqueur indiquant le nombre de valeurs par vecteur
 		concatVect(Vecteur, nbV, Vect_out, &nbOut);
 		delete Vect_out;
 	}
@@ -135,8 +135,9 @@ class Image {
 		int *Vect_temp = new int[64];
 		int nbIn = 0;
 		//on recupère this->vecteur128 compressé issu de vecteurRGB
+		deconcatVect(Vecteur, nbElem, this->Vecteur128, &nbIn);
 		
-		//on le decompresse
+		//on decompresse this->Vecteur128
 		decompression_zigzag(this->Vecteur128, Vect_temp, nbIn);
 		
 		//on le met dans une matrice avec zigzag
@@ -153,23 +154,44 @@ class Image {
 				matriceNN[x+i][y+j] = this->Matrice8x8[i][j];
 	}
 	
-	void concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){
-		//on met this->Vecteur128 au bout de V
+	void concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on met V2 au bout de V1
+		
 		//on cherche la bonne case
 		int i=0, cpt=0;//compteur de case et compteur cumulé
 		while(cpt < *nb_val1){
 			cpt += V1[i];
 			i += 2;
 		}
-		//i est à la bonne position, on remplit
-		while(cpt <= (*nb_val1 + *nb_val2)){
+		//i est à la bonne position, on remplit par le nb de valeur à mettre puis le vecteur
+		V1[i] = *nb_val2;
+		i++;
+		while(cpt <= (*nb_val1 + *nb_val2)){ //on rempli jusqu'a avoir assez de valeurs de V1 + V2
 			V1[i]=V2[i];
 			V1[i+1]=V2[i+1];
-			cpt+=V2[i+1];
+			cpt+=V2[i];
 			i+=2;
 		}
 		//on met à jour nb_val1
 		*nb_val1 = cpt;
+	}
+	
+	void deconcatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on attribue un vecteur issu de V1 à V2, et on slide le V1 vers la gauche du nb de valeurs récupérées
+		
+		int i=1, cpt=0;//compteur de case et compteur cumulé
+		
+		//check du bon nombre de valeurs à prendre
+		*nb_val2 = V1[0];
+		
+		while(cpt < *nb_val2){
+			V2[i] = V1[i];
+			V2[i+1] = V1[i+1];
+			cpt += V1[i];
+			i += 2;
+		}
+		
+		//on décale V1 vers la gauche de i cases en arithmétique de pointeur
+		V1 = V1+i;
+
 	}
 
 	void suppression_zeros(int *V1, int *V2, int *size_vect){
