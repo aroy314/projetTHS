@@ -17,26 +17,36 @@ void save_img(CImg <int> image, const char* file) {
 	image.save(file);
 }
 
-int* Dimensions(CImg<int> image){
+int* Dimensions(CImg<int> image){ //Pour calculer les dimensions de l'image
 	int* tab = new int[2];
 	tab[0] = image.dimx();
 	tab[1] = image.dimy();
 	return tab;
 }
 
-/*CImg<int> Resize(CImg<int> image) {
-	if (image.dimx()<image.dimy())
-	{
-	for (int i = image.dimx(); i < image.dimy(); i++) {
+CImg<int> ResizeX(CImg<int> image) { //Redimension si dimx < dimy
+	CImg<int> newImage(image.dimy(), image.dimy(), 1, 3, 0);
+	for (int i = 0; i < image.dimx(); i++) {
 		for (int j = 0; j < image.dimy(); j++) {
 			for (int k = 0; k < image.dimv(); k++) {
-				image(i,j,0,k)=0;
+				newImage(i,j,0,k) = image(i,j,0,k);
 				}
 			}
 		}
-	}
-	return image;
-}*/
+	return newImage;
+}
+
+CImg<int> ResizeY(CImg<int> image) { //Redimension si dimx > dimy
+	CImg<int> newImage(image.dimx(), image.dimx(), 1, 3, 0);
+	for (int i = 0; i < image.dimx(); i++) {
+		for (int j = 0; j < image.dimy(); j++) {
+			for (int k = 0; k < image.dimv(); k++) {
+				newImage(i,j,0,k) = image(i,j,0,k);
+				}
+			}
+		}
+	return newImage;
+}
 
 
 int main() 
@@ -46,19 +56,11 @@ int main()
 	int* tab = Dimensions(image);
 	cout << "X = " << tab[0] << endl << "Y = " << tab[1] << endl;
 	delete tab;
-//	image = Resize(image);
 	
-	CImg<int> image2(image.dimy(),image.dimy(), 1, 3, 0);
-	if (image.dimx()<image.dimy())
-	{
-	for (int i = 0; i < image.dimx(); i++) {
-		for (int j = 0; j < image.dimy(); j++) {
-			for (int k = 0; k < image.dimv(); k++) {
-				image2(i,j,0,k) = image(i,j,0,k);
-				}
-			}
-		}
-	}
+	if(image.dimx() < image.dimy());
+	image = ResizeX(image);
+	if(image.dimx() > image.dimy());
+	image = ResizeY(image);
 	
 	int* newtab = Dimensions(image);
 	cout << "X = " << newtab[0] << endl << "Y = " << newtab[1] << endl;
@@ -78,7 +80,6 @@ int main()
 				cout << image(i,j,0,k);
 			}}}
 */	
-	save_img(image2, "black.jpg");
 	save_img(image, "out.jpg");
 	
 
