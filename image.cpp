@@ -15,6 +15,7 @@ using namespace std;
 class Image {
 	
 	// ------------------- PRIVATE ----------------------
+	
 	// ------------------- ATTRIBUTS --------------------
     private :
     int taille;             //img squared size
@@ -22,11 +23,13 @@ class Image {
     int **R = NULL;         //two dimensions matrix
     int **G = NULL;
     int **B = NULL;
+	
     int *VecteursR = NULL;  //Vector R G and B compressed
 	int *VecteursG = NULL;
 	int *VecteursB = NULL;
 	int *Vecteur	= NULL; // FINAL VECTOR TO WRITE ON DISK
 	int *Vecteur128 = NULL; // Vector compressed from Matrix8x8
+	
     int **Matrice8x8 = NULL;//8x8 matrix we work with
     int **Q = NULL;         //quantification matrix
 	
@@ -100,6 +103,7 @@ class Image {
     }
 	
 	void dct_2D_Inv(int **Matrice8x8){//dosda
+		
 	}
 	
 	//fonction de recup d'une matrice NxN et allocation de la 8x8 selon des paramètres x,y (haut gauche de la matrice)
@@ -353,6 +357,12 @@ class Image {
 		this->Vecteur		= new int[6*this->taille*this->taille+3]; //contiens les vect RGB + nb de val dans chacun à chaque debut de vect
 		
 		//attribution des matrices RGB selon la matrice image
+		for(int i=0;i<this->taille;i=i+3)
+			for(int j=0;j<this->taille;i++){
+				this->R[i][j] = this->image[i][j];
+				this->G[i][j] = this->image[i+1][j];
+				this->B[i][j] = this->image[i+2][j];
+			}
 		
         //calcul de Q
         int q;
