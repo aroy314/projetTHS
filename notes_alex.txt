@@ -49,8 +49,16 @@ En résumé {
 	morcelé en 8x8 (si pas multiple on complete avec des zéros)
 	for(toutes les 8x8){
 		DCT 2D()
-		Quantification() + zigzag()
+		Quantification() + zigzag() + compression sans perte
 	}
+	mise bout à bout des vecteurs[128] (2x64 valeurs dans le pire des cas) avec supression des deux dernières cases (le nb de zeros)
+	Pair : qté, impair : valeur
+	Mise bout à bout du vecteur R, G et B avec entre eux le nb de valeurs de chacun 
+	Ecriture de ce vecteur final en .txt
+	-> on obtient un format compressé de l'img
+	Decompression dans l'autre sens
+
+
 }
 
 Quantification(){
