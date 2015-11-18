@@ -7,8 +7,8 @@
 //
 
 #include <iostream>
-#include "image.hpp"
 #include <math.h>
+#include "image.hpp"
 
 using namespace std;
 
@@ -32,8 +32,7 @@ class Image {
 	
     int **Matrice8x8 = NULL;//8x8 matrix we work with
     int **Q = NULL;         //quantification matrix
-	
-	
+
 	// ------------------- FONCTIONS ----------------------
     
     void initQ(int q){			// Création de la matrice de quantification
@@ -45,14 +44,16 @@ class Image {
         }
         cout << "Q initialisée\n";
     }
-  
+    
     // Application de la phase de quantification sur chacune des matrices
     void quantification(int ** Obj) {					   // on récupère notre matrice 8x8
         int k,l;
         for(k=0;k<8;k++)					 // parcourt lignes
             for (l=0;l<8;l++)				// parcourt colonnes
                 Obj[k][l] = Obj[k][l]/this->Q[k][l];    // divise notre matrice 8x8 par l'objet Q, membre à membre
-        cout << "quantification faite\n";
+        
+        std::cout << "quantification faite\n";
+
     }
     
         // Application de la phase de quantification inverse sur chacune des matrices
@@ -63,11 +64,10 @@ class Image {
                 Obj[k][l] = Obj[k][l]*this->Q[k][l];    // multiplie notre matrice 8x8 par l'objet Q, membre à membre
         std::cout << "quantification inverse faite\n";
     }
-    
-    void charge_img(const char * nom_image[], int *taille){
-        //lecture du fichier et attribution dans image NN, et envoi de la taille dans *taille
-		cout << "image chargée \n";
-    }
+	
+	void charge_img(const char * nom_image[],int *taille){
+		
+	}
 	
     void dct_2D(int **Matrice8x8){
 		
@@ -83,28 +83,72 @@ class Image {
             for (int j=0; j<8; j++){
 				Matrice_dct[i][j] = 0;
                 for (int x=0; x<8; x++)
-                    for (int y=0; y<8; y++){
-                        if (i==0)
-                            Ci=1/sqrt(2);
-                        else Ci=1;
-                        if (j==0)
-                            Cj=1/sqrt(2);
-                        else Cj=1;
+                    for (int y=0; y<8; y++)
+                    {
+                        (i==0) ? Ci=1/sqrt(2): Ci=1;
+                        (j==0) ? Cj=1/sqrt(2): Cj=1;
                         
                         Matrice_dct[i][j] += Matrice8x8[x][y]*(Ci*Cj)/4*cos(((2*x+1)*i*M_PI)/16)*cos(((2*y+1)*j*M_PI)/16);
                     }
             }
+        
+        
+        for (int i=0; i<8; i++)//arondicement des valeurs
+            for (int j=0; j<8; j++)
+            {
+                Matrice8x8[i][j]=Matrice_dct[i][j];
+            }
+        
+//        for (int i=0; i<8; i++)//arondicement des valeurs
+//            for (int j=0; j<8; j++)
+//            {
+//                if(Matrice_dct[i][j]>0)
+//                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
+//                        Matrice8x8[i][j]=Matrice_dct[i][j];
+//                else
+//                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>-0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
+//                    Matrice8x8[i][j]=Matrice_dct[i][j];
+//            }
+    
+        }
+	
+    void dct_2D_Inverse(int **Matrice8x8){
+        float **Matrice_dct = new float*[8];
+        for (int i = 0; i < 8; i++)
+            Matrice_dct[i] = new float[8];
+        
+        float Cx;
+        float Cy;
+        
+        for (int i=0; i<8; i++)
+            for (int j=0; j<8; j++){
+				Matrice_dct[i][j] = 0;
+                for (int x=0; x<8; x++)
+                  for (int y=0; y<8; y++){
+                        (x==0) ? Cx=1/sqrt(2): Cx=1;
+                        (y==0) ? Cy=1/sqrt(2): Cy=1;
+                        Matrice_dct[i][j]+=(1/sqrt(16))*(Matrice8x8[x][y]*Cx*Cy*cos(((2*i+1)*x*M_PI)/16)*cos(((2*j+1)*y*M_PI)/16));
+                    }
+            }
+//        
+//        for (int i=0; i<8; i++)//arondissement des valeurs
+//            for (int j=0; j<8; j++)
+//            {
+//                if(Matrice_dct[i][j]>0)
+//                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
+//                    Matrice8x8[i][j]=Matrice_dct[i][j];
+//                else
+//                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>-0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
+//                    Matrice8x8[i][j]=Matrice_dct[i][j];
+//            }
 		
         for (int i=0; i<8; i++)
             for (int j=0; j<8; j++)
                 Matrice8x8[i][j] = Matrice_dct[i][j];
 		
-		cout << "DCT2D faite\n";
+		cout << "DCT2D inverse faite\n";
+
     }
-	
-	void dct_2D_Inv(int **Matrice8x8){//dosda
-		
-	}
 	
 	//fonction de recup d'une matrice NxN et allocation de la 8x8 selon des paramètres x,y (haut gauche de la matrice)
 	void compression8x8(int x, int y, int **matriceNN, int *Vecteur, int *nbV){
@@ -149,7 +193,7 @@ class Image {
 		delete Vect_temp;
 		
 		//on effectue la quantif inverse + la dct inverse
-		dct_2D_Inv(this->Matrice8x8);
+		dct_2D_Inverse(this->Matrice8x8);
 		quantification_inv(this->Matrice8x8);
 		
 		//on écrit la 8x8 au bon endroit dans la NxN
@@ -302,14 +346,6 @@ class Image {
 		
 	}
 	
-	void zigzag_inverse(int **Matrice8x8, int *Vect){//mathilde
-		//lecture du vecteur compressé
-		//ecriture d'une matrice 88
-		
-		cout << "ZigZag Inverse fait" << endl;
-		
-	}
-	
 	void compression_zigzag(int *V1, int* V2, int *nb_elem){//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
 		
 	}
@@ -318,8 +354,54 @@ class Image {
 		
 	}
 	
-
+	void EcritureFinal_jpg(int *Vecteur){//Dosda
+		//Ecriture fichier en jpg
+		
+		std::cout << "Ecriture faite\n";
+		
+	}
+	
+	void zigzag_inverse (int ** Obj,int * linea) {
+		
+		int pos;
+		int k,l;	// k indices lignes, l indice colonnes
+		
+		for (int i=0 ; i<8 ;i++)
+			for ( int j=0 ; j<8 ; j++)
+				Obj[i][j] = 0;		// on rempli notre tableau de 0
+		
+		while ((k!=7)||(l!=7))			// tant qu'on n'est pas arrivé au dernier élément de la matrice
+		{
+			while((k!=0)&&(l!=7))		// tant qu'on n'est pas à la fin de la première ligne de la matrice
+			{
+				Obj[k][l]=linea[pos++];		// on récupère dans la matrice l'élément correspondant de la linéarisation
+				k--;				// on décrémente les lignes
+				l++;				// on incrémente les colonnes
+			}				// --> diago croissante
+			Obj[k][l]=linea[pos++];		// on récupère à nouveau l'élément de linéarisation dans la matrice
+			if(l==7)
+				k++;
+			else
+				l++;
+			while((k!=7)&&(l!=0))		// tant qu'on n'est pas au début de la dernière ligne de la matrice
+			{
+				Obj[k][l]=linea[pos++];		// on récupère dans la matrice l'élément correspondant de la linéarisation
+				k++;				// on décrémente les lignes
+				l--;				// on incrémente les colonnes
+			}				// --> diago décroissante
+			Obj[k][l]=linea[pos++];		// on récupère à nouveau l'élément de linéarisation dans la matrice
+			if(k==7)
+				l++;
+			else
+				k++;
+		}
+		
+		Obj[k][l]=linea[pos];
+		cout << "ZigZag Inverse fait\n";
+	}
+	
 	// ------------------- PUBLIC ----------------------
+
     public :
     Image(const char * nom_image[]){ //CONSTRUCTEUR
 		
@@ -366,11 +448,18 @@ class Image {
 		
         //calcul de Q
         int q;
+        
+        this->Q = new int*[8]; //init Matrice Q
+        for (int i = 0; i < 8; i++)
+            Q[i] = new int[8];
+        
+        
         cout << "Entrez le paramètre de compression : ";
         cin >> q;
         initQ(q);
         
         cout << "construction faite\n";
+
     }
     
     ~Image(){ //DESTRUCTEUR
@@ -433,11 +522,12 @@ class Image {
 			//on ecrit Vecteur dans un fichier
 			char *nom_fichierVect = new char[50];
 			//ecrit_Vect(this->Vecteur, nomfichierVect);
-        
+			
 			cout << "compression faite, fichier ecrit : " << nom_fichierVect << endl;
 		}
-	}
-	
+
+    }
+    
 	void decompression(){	//compression à l'envers
 		char *nom_fichierVect = new char[50];
 		//lecture_Vect(nomfichierVect, this->Vecteur);
@@ -458,4 +548,8 @@ class Image {
 		
 		cout << "decompression faite" << endl;
 	}
+
+	
+	
 };
+
