@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
     
-    //allocation de l'objet image
+/*    //allocation de l'objet image
         //le constructeur charge l'img et alloue les 3 matrices
     Image *image = new Image(argv);
 	
@@ -27,34 +27,16 @@ int main(int argc, const char * argv[]) {
 	
 	
     cout << "fin du traitement\n" ;
-    delete image; //liberation memoire
+   */
+    
+
+ //   delete image; //liberation memoire
     /*
     int a=1;
     int **Matrice = new int*[8];
     for (int i = 0; i < 8; i++)
         Matrice[i] = new int[8];
     
-    Image* image= new Image();
-    
-    
-    for (int i=0; i<8; i++)
-        for (int j=0; j<8; j++)
-            Matrice[i][j]=((i+a));
-    
-    
-    image->dct_2D_V1(Matrice);
-    
-    
-    for (int i=0; i<8; i++)
-        for (int j=0; j<8; j++)
-        {
-            printf("%d ", Matrice[i][j]);
-            if(j==7)
-            {
-                printf("\n");
-            }
-            
-        }
     
     */
     return 0;

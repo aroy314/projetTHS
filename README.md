@@ -16,7 +16,7 @@ Pour faciliter les operations, nous privilegeons la separation de notre matrice 
 
 ###Troisieme etape : Operations sur les blocs 8x8
 
-####**Discret Cosin Transform**
+#####**Discret Cosin Transform**
 
 On filtre les informations grace à la transformee en cosinus qui donne accès aux fréquences. Le calcul de la DCT permet la transformation de notre image, la compression. Il contient 4 boucles de 0 = M − 1. Ici l’algorithme considere des matrices M = 8.  Il suffit de leur appliquer la formule de la DCT. 
 
