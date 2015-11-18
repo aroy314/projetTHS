@@ -187,5 +187,49 @@ class Image {
         
     }
     
+    void zigzag_inverse (int * linea, int ** Obj) {
+
+int pos;	
+int k,l;	// k indices lignes, l indice colonnes
+
+
+
+for (int i=0 ; i<8 ;i++) {
+	for ( int j=0 ; j<8 ; j++) {
+	
+		Obj[i][j] = 0;		// on rempli notre tableau de 0
+	}
+}
+
+
+while ((k!=7)||(l!=7))			// tant qu'on n'est pas arrivé au dernier élément de la matrice
+{	
+	while((k!=0)&&(l!=7))		// tant qu'on n'est pas à la fin de la première ligne de la matrice
+	{
+		Obj[k][l]=linea[pos++];		// on récupère dans la matrice l'élément correspondant de la linéarisation
+		k--;				// on décrémente les lignes
+		l++;				// on incrémente les colonnes
+	}				// --> diago croissante
+	Obj[k][l]=linea[pos++];		// on récupère à nouveau l'élément de linéarisation dans la matrice 
+		if(l==7)
+		k++;
+		else
+		l++;
+	while((k!=7)&&(l!=0))		// tant qu'on n'est pas au début de la dernière ligne de la matrice
+	{	
+		Obj[k][l]=linea[pos++];		// on récupère dans la matrice l'élément correspondant de la linéarisation
+		k++;				// on décrémente les lignes
+		l--;				// on incrémente les colonnes
+	}				// --> diago décroissante
+	Obj[k][l]=linea[pos++];		// on récupère à nouveau l'élément de linéarisation dans la matrice 
+		if(k==7)		
+		l++;
+		else
+		k++;
+}
+
+Obj[k][l]=linea[pos];
+
+}
 
 };
