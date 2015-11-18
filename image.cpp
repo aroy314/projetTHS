@@ -241,8 +241,53 @@ class Image {
 		cout << "Vecteur Final : " << "nb de cases : " << i << endl << "nb de valeurs : " << cptVect << endl;
 	}
 	
-	void unfuuusion(int *V, int *R, int *nbR, int *G, int *nbG, int *B, int *nbB){
+	void unfuuusion(int *V, int *R, int *nbR, int *G, int *nbG, int *B, int *nbB){	//Separation de V en R/G/B
 		
+		int i=1, cpt=0;//compteur de case et compteur cumulé
+		//sauvegarde de pointeur
+		int *SVG = V;
+
+		//check du bon nombre de valeurs à prendre
+		*nbR = V[0];
+		//recup de R
+		while(cpt < *nbR){
+			R[i]	= V[i];
+			R[i+1]	= V[i+1];
+			cpt += V[i];
+			i += 2;
+		}
+		//reinit de cpt
+		cpt = 0;
+		//decalage de V puis réinit de i
+		V = V+i;
+		i = 1;
+		//check du bon nombre de valeurs à prendre
+		*nbG = V[0];
+		//recup de G
+		while(cpt < *nbG){
+			G[i]	= V[i];
+			G[i+1]	= V[i+1];
+			cpt	+= V[i];
+			i	+= 2;
+		}
+		//reinit de cpt
+		cpt = 0;
+		//decalage de V puis réinit de i
+		V = V+i;
+		i = 1;
+		//check du bon nombre de valeurs à prendre
+		*nbB = V[0];
+		//recup de G
+		while(cpt < *nbB){
+			B[i]	= V[i];
+			B[i+1]	= V[i+1];
+			cpt += V[i];
+			i += 2;
+		}
+		//recup du bon pointeur sur V
+		V = SVG;
+		
+		cout << "unfuuusion fait" << endl;
 	}
 	
 	void zigzag(int **Matrice8x8, int *Vect){//poisson
