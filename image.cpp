@@ -165,7 +165,7 @@ class Image {
         std::cout << "Entrez le paramètre de compression : ";
         std::cin >> q;
         initQ(q);
-        
+         
         std::cout << "construction faite\n";
     }
     
