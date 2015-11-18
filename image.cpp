@@ -15,9 +15,8 @@ using namespace std;
 class Image {
 	
 	// ------------------- PRIVATE ----------------------
-	
+	private :
 	// ------------------- ATTRIBUTS --------------------
-    private :
     int taille;             //img squared size
     int **image = NULL;     //image de base
     int **R = NULL;         //two dimensions matrix
