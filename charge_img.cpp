@@ -28,24 +28,47 @@ int* Dimensions(CImg<int> image){ //Pour calculer les dimensions de l'image
 int** MiseEnMatrice(CImg<int> image, int** matrice, int* x, int* y){
 	
 	matrice = new int*[*x];		//Création matrice
-	for(int i=0; i<*x; i++)
+	for (int i=0; i<*x; i++)
 		matrice[i] = new int[*y];
 	
-	for (int i=0; i<image.dimx(); i=i+3){	//Remplissage matrice
+	for (int i=0; i<image.dimx(); i++){	//Remplissage matrice
 		for (int j=0; j<image.dimy(); j++){
-			matrice[i][j]=image(i,j,0,0);
-			matrice[i+1][j]=image(i,j,0,1);
-			matrice[i+2][j]=image(i,j,0,2);
-		}
+			for (int k=0; k<image.dimv(); k++){
+			matrice[i+k][j]=image(i,j,0,k);  //Probleme chevauchement des valeurs dans le matrice[i+k] !
+			}	
+		}	
 	}
 	return matrice;
 }
 
-/*void Free_Tab(){
-	for (int i=0; i<10000; i++)
+int** Multiple8(int** matrice, int* x, int* y){
+	int i = *x % 8, j = *y % 8;
+
+	if (i!=0)
+		{
+		x += 8 - i;
+		}
+	else if (j != 0)
+		{
+		y += 8 - j;
+		}
+
+	int** matrice8 = new int*[*x];
+	for (int i = 0; i<*x; i++)	//Création nouvelle matrice multiple de 8
+		matrice8[i] = new int[*y];
+
+	for (int i=0; i<*x; i++)	// Remplissage matrice multiple de 8 (Demander a alex si = ou <=)
+		for (int j=0; j<*y; j++)
+			matrice8[i][j] = matrice[i][j];
+	return matrice8;
+
+}
+
+void Free(int** matrice, int* x){
+	for (int i=0; i<*x; i++)
 		delete[] matrice[i];
 	delete[] matrice;
-}*/
+}
 
 /*CImg<int> ResizeX(CImg<int> image) { //Redimension si dimx < dimy
 	CImg<int> newImage(image.dimy(), image.dimy(), 1, 3, 0);
@@ -83,9 +106,10 @@ int main()
 	delete tab;
 
 	int x = image.dimx()*3;
-	int y = image.dimy()*3;
+	int y = image.dimy();
 	matrice = MiseEnMatrice(image, matrice, &x, &y);
-
+//	matrice = Multiple8(matrice, &x, &y);
+	
 /*	for (int i = 0; i < image.dimx(); i++) {
 		for (int j = 0; j < image.dimy(); j++) {
 			cout << endl;
@@ -93,17 +117,18 @@ int main()
 			cout << image(i,j,0,k);
 				}}}
 
-
-	for (int i = 0; i < image.dimx(); i++){
-		for (int j = 0; j < image.dimy(); j++){
+*/
+	for (int i = 0; i < x; i++){
+		for (int j = 0; j < y; j++){
 			cout << matrice[i][j];
 			cout << matrice[i+1][j];
 			cout << matrice[i+2][j];
-			cout << endl;
+			//cout << endl;
 			}}
-*/
+
 	save_img(image, "out.jpg");
-	
+
+	Free(matrice, &x);	
 
 //  CImgDisplay main_disp(image,"Click a point");
 //  while (!main_disp.is_closed()){
