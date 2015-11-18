@@ -8,6 +8,7 @@
 using namespace cimg_library;
 using namespace std;
 
+
 CImg<int> charge_img(const char* file) {
 	CImg<int> image (file);
 	return image;
@@ -24,17 +25,12 @@ int* Dimensions(CImg<int> image){ //Pour calculer les dimensions de l'image
 	return tab;
 }
 
-int** MiseEnMatrice(CImg<int> image, int** matrice){
-	int size = image.dimx()>image.dimy()? image.dimx():image.dimy();
+int** MiseEnMatrice(CImg<int> image, int** matrice, int* x, int* y){
 	
-	matrice = new int*[size*3];		//Création matrice
-	for(int i=0; i<size*3; i++)
-		matrice[i] = new int[size*3];
+	matrice = new int*[*x];		//Création matrice
+	for(int i=0; i<*x; i++)
+		matrice[i] = new int[*y];
 	
-	for (int i=0; i<size*3; i++)		//Initialistation à 0
-		for (int j=0; j<size*3; j++)
-			matrice[i][j]=0;
-
 	for (int i=0; i<image.dimx(); i=i+3){	//Remplissage matrice
 		for (int j=0; j<image.dimy(); j++){
 			matrice[i][j]=image(i,j,0,0);
@@ -86,7 +82,9 @@ int main()
 	cout << "X = " << tab[0] << endl << "Y = " << tab[1] << endl;
 	delete tab;
 
-	matrice = MiseEnMatrice(image, matrice);
+	int x = image.dimx()*3;
+	int y = image.dimy()*3;
+	matrice = MiseEnMatrice(image, matrice, &x, &y);
 
 /*	for (int i = 0; i < image.dimx(); i++) {
 		for (int j = 0; j < image.dimy(); j++) {
