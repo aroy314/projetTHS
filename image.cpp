@@ -64,7 +64,6 @@ class Image {
     void dct_2D(int **Matrice8x8){
 		
 		//allocation d'une matrice de travail
-		//à optimiser et garder seulement la matrice passée en paramètre
         int **Matrice_dct = new int*[8];
         for (int i = 0; i < 8; i++)
             Matrice_dct[i] = new int[8];
@@ -88,7 +87,6 @@ class Image {
                     }
             }
 		
-		//à optimiser et garder seulement la matrice passée en paramètre
         for (int i=0; i<8; i++)
             for (int j=0; j<8; j++)
                 Matrice8x8[i][j] = Matrice_dct[i][j];
@@ -180,7 +178,7 @@ class Image {
 		}
 	
 	//fonction de recup d'une matrice NxN et allocation de la 8x8 selon des paramètres x,y (haut gauche de la matrice)
-	void compression8x8(int x, int y, int **matriceNN, int* Vecteur){
+	void compression8x8(int x, int y, int **matriceNN, int *nb_compress){
 		//recup de la 8x8
 		for(int i=0;i<8;i++)
 			for(int j=0;j<8;j++)
@@ -190,23 +188,39 @@ class Image {
 		dct_2D(this->Matrice8x8);
 		quantification(this->Matrice8x8);
 		
-		//besoin d'un int pour savoir ou on en est dans le vecteur global R/G/B qu'on nomme position
-		int position = 0;
+		//ATTENTION TAILLES DE VECTEURS A VERIFIER POUR EVITER MEMORY FAULT
+		
 		int *Vect_temp = new int[128];
 		zigzag(this->Matrice8x8, Vect_temp);
-		compression_zigzag(Vect_temp,this->Vecteur128,&position);
+		compression_zigzag(Vect_temp, this->Vecteur128, nb_compress);
 		delete Vect_temp;
 		
-		//suppression des 0 et raccourcissement du vecteur de taille size
-		int size_vect = 0;
-		int *Vect_temp2 = new int[size_vect];
-		//raccourcissement(&size_vect, );
-		
-		//ecriture du vecteur128 dans le vecteur correspondant
-		
-		for(int i=0;i<size_vect;i++)
-			Vecteur[position + i] = Vect_temp2[i];
-		
+		//suppression des 0 et raccourcissement du vecteur
+		int *Vect_temp2 = NULL;
+		suppression_zeros(this->Vecteur128, Vect_temp2, nb_compress);//nb_compress doit réduire de 2 si on enlève les 0
+		//on met le tout dans vect128
+		this->Vecteur128 = Vect_temp2;
+		delete Vect_temp2;
+
+	}
+	
+	void concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){
+		//on met this->Vecteur128 au bout de V
+		//on cherche la bonne case
+		int i=0, cpt=0;//compteur de case et compteur cumulé
+		while(cpt < *nb_val1){
+			cpt += V1[i];
+			i += 2;
+		}
+		//i est à la bonne position, on remplit
+		while(cpt <= (*nb_val1 + *nb_val2)){
+			V1[i]=V2[i];
+			V1[i+1]=V2[i+1];
+			cpt+=V2[i+1];
+			i+=2;
+		}
+		//on met à jour nb_val1
+		*nb_val1 = cpt;
 	}
 	
 	void decompression8x8(int x, int y, int **matriceNN, int* Vecteur){
@@ -218,28 +232,83 @@ class Image {
 		if(this->taille%8==0)//test tout bête
 			cout << "Erreur dans la taille des matrices : pas multiple de 8";
 		
+		//entier indiquant le nb de val de chaque vecteur
+		static int nbR=0, nbG=0, nbB=0, nbV128=0;
+		
         //pour R, G et B :
 			for(int i=0;i<this->taille/8;i++)
 				for(int j=0;j<this->taille/8;j++){
-					compression8x8(i*8,j*8,this->R,this->VecteursR);
-					compression8x8(i*8,j*8,this->G,this->VecteursG);
-					compression8x8(i*8,j*8,this->B,this->VecteursB);
+					compression8x8(i*8,j*8,this->R,&nbV128);//preparation de Vecteur128
+					concatVect(this->VecteursR,&nbR,this->Vecteur128,&nbV128);//on concatène Vecteur 128 au bout de VecteursR
+					//compression8x8(i*8,j*8,this->G,this->VecteursG,&nbG);
+					//compression8x8(i*8,j*8,this->B,this->VecteursB,&nbB);
 				}
+		//mise bout à bout des 3 vecteurs RGB dans Vecteur, séparé par une case indiquant le nb de valeurs dans chacun
+		fuuusion(this->VecteursR,nbR,this->VecteursG,nbG,this->VecteursB,nbB,this->Vecteur);
+		
+		//on ecrit Vecteur dans un fichier
+		//ecrit_Vect(this->Vecteur);
         
         cout << "compression faite\n";
     }
 	
+	void suppression_zeros(int *V1, int *V2, int *size_vect){
+		if(V1[*size_vect]==0)
+			*size_vect -= 2;
+		//creation du nouveau vecteur
+		V2 = new int[*size_vect];
+		for(int i=0;i<*size_vect;i++)
+			V2[i] = V1[i];
+	}
+	
+	void fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
+		
+		int i=1;//notre compteur
+		int cpt=0;//compteur cumulé
+		int cptVect=0;//compteur cumulé des 3 vect
+		//RED
+		V[0]=nbR;
+		while(cpt<nbR){
+			V[i] = R[i];	//qté
+			V[i+1] = V[i+1];//valeur
+			i+=2;
+			cpt+=V[i+1];
+		}
+		//GREEN
+		V[i]=nbG;
+		i++;
+		cptVect+=cpt;
+		cpt=0;//réinit du compteur cumulé
+		while(cpt<nbG){
+			V[i] = R[i];	//qté
+			V[i+1] = V[i+1];//valeur
+			i+=2;
+			cpt+=V[i+1];
+		}
+		//BLUE
+		V[i]=nbB;
+		i++;
+		cpt=0;//réinit du compteur cumulé
+		while(cpt<nbB){
+			V[i] = R[i];	//qté
+			V[i+1] = V[i+1];//valeur
+			i+=2;
+			cpt+=V[i+1];
+		}
+		cptVect+=cpt;
+		cout << "Vecteur Final : " << "nb de cases : " << i << endl << "nb de valeurs : " << cptVect << endl;
+	}
+	
 	void decompression(){
-		
-		cout << "decompression faite\n";
-		
+		//compression à l'envers
+		cout << "decompression faite" << endl;
 	}
 	
     void zigzag(int **Matrice8x8, int *Vect){//poisson
         //lecture de la 88 image
         //ecriture de Vecteur avec la lecture en zigzag
         
-        cout << "ZigZag fait\n";
+        cout << "ZigZag fait" << endl;
         
     }
 	
@@ -247,11 +316,11 @@ class Image {
 		//lecture du vecteur compressé
 		//ecriture d'une matrice 88
 		
-		cout << "ZigZag Inverse fait\n";
+		cout << "ZigZag Inverse fait" << endl;
 		
 	}
 	
-	void compression_zigzag(int *V1, int* V2, int *position){//V1 vecteur non compressé, V2 vecteur non compressé, position = nombre de cases
+	void compression_zigzag(int *V1, int* V2, int *nb_cases){//V1 vecteur non compressé, V2 vecteur compressé, position = nombre de cases
 		
 	}
 	
