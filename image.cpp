@@ -494,41 +494,6 @@ class Image {
 		cout << "destruction faite\n";
 		}
 	
-	//fonction de recup d'une matrice NxN et allocation de la 8x8 selon des paramètres x,y (haut gauche de la matrice)
-	void compression8x8(int x, int y, int **matriceNN, int* Vecteur){
-		//recup de la 8x8
-		for(int i=0;i<8;i++)
-			for(int j=0;j<8;j++)
-				this->Matrice8x8[i][j] = matriceNN[x+i][y+j];
-		
-		//traitement et compression
-		dct_2D(this->Matrice8x8);
-		quantification(this->Matrice8x8);
-		
-		//besoin d'un int pour savoir ou on en est dans le vecteur global R/G/B qu'on nomme position
-		int position = 0;
-		int *Vect_temp = new int[128];
-		zigzag(this->Matrice8x8, Vect_temp);
-//--------//compression_zigzag(Vect_temp,this->Vecteur128,&position);
-		delete Vect_temp;
-		
-		//suppression des 0 et raccourcissement du vecteur de taille size
-		int size_vect = 0;
-		int *Vect_temp2 = new int[size_vect];
-		//raccourcissement(&size_vect, );
-		
-		//ecriture du vecteur128 dans le vecteur correspondant
-		
-		for(int i=0;i<size_vect;i++)
-			Vecteur[position + i] = Vect_temp2[i];
-		
-	}
-	
-	void decompression8x8(int x, int y, int **matriceNN, int* Vecteur){
-		
-	}
-
-	
     void compression(){
 		
 		if(this->taille%8==0)//test tout bête
@@ -551,7 +516,7 @@ class Image {
 		
 			//on ecrit Vecteur dans un fichier
 			char *nom_fichierVect = new char[50];
-			//ecrit_Vect(this->Vecteur, nomfichierVect);
+			//ecritVect(this->Vecteur, nomfichierVect);
 			
 			cout << "compression faite, fichier ecrit : " << nom_fichierVect << endl;
 		}
