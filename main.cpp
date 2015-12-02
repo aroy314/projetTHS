@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
     
-/*    //allocation de l'objet image
+   //allocation de l'objet image
         //le constructeur charge l'img et alloue les 3 matrices
     Image *image = new Image(argv);
 	
@@ -27,7 +27,7 @@ int main(int argc, const char * argv[]) {
 	
 	
     cout << "fin du traitement\n" ;
-   */
+
     
 
  //   delete image; //liberation memoire
@@ -175,25 +175,8 @@ int main(int argc, const char * argv[]) {
 //    
     
     
-//==============================================================================
-  
-    Image *image = new Image(argv);
-    int *x=new int;
+
     
-    
-    int *comp=new int[128];
-    int matrice[64]={1,1,1,4,5,3,3,7,10,5,5,5,5,5,5,5,5,5,5,5,0,0,0,2,2,1,1,1,4,5,3,3,7,10,5,5,5,5,5,5,5,5,5,5,5,0,0,0,2,2,0,0,0,2,2,0,0,0,2,2,0,0,0,2};
-    int *matrice2=new int[64];
-    
-    image->compression_zigzag(matrice, comp, x);
-    printf("X ------->  %d", *x);
-    printf("X ------->  %d", *comp);
-    for (int i=0;i<x[0]; i++)
-    printf("  %d  ", comp[i]);
-    image->decompression_zigzag(matrice2, comp, x);
-    
-    printf("\n x----->   %d  \n ", x[0]);
- //==============================================================================
-    
-    return 0;
+
+     return 0;
 }
