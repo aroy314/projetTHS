@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include <math.h>
 #include "image.hpp"
 
@@ -45,22 +46,22 @@ class Image {
     }
     
     // Application de la phase de quantification sur chacune des matrices
-    void quantification(int ** Obj) {					   // on récupère notre matrice 8x8
+    void quantification(int ** Obj) {		// on récupère notre matrice 8x8
         int k,l;
-        for(k=0;k<8;k++)					 // parcourt lignes
+        for(k=0;k<8;k++)					// parcourt lignes
             for (l=0;l<8;l++)				// parcourt colonnes
-                Obj[k][l] = Obj[k][l]/this->Q[k][l];    // divise notre matrice 8x8 par l'objet Q, membre à membre
+                Obj[k][l] = (int) (Obj[k][l]/this->Q[k][l]);    // divise notre matrice 8x8 par l'objet Q, membre à membre
         
         std::cout << "quantification faite\n";
 
     }
     
         // Application de la phase de quantification inverse sur chacune des matrices
-    void quantification_inv(int ** Obj) {					   // on récupère notre matrice 8x8
+    void quantification_inv(int ** Obj) {	// on récupère notre matrice 8x8
         int k,l;
-        for(k=0;k<8;k++)					 // parcourt lignes
+        for(k=0;k<8;k++)					// parcourt lignes
             for (l=0;l<8;l++)				// parcourt colonnes
-                Obj[k][l] = Obj[k][l]*this->Q[k][l];    // multiplie notre matrice 8x8 par l'objet Q, membre à membre
+                Obj[k][l] = (int) (Obj[k][l]*this->Q[k][l]);    // multiplie notre matrice 8x8 par l'objet Q, membre à membre
         std::cout << "quantification inverse faite\n";
     }
 	
@@ -145,7 +146,7 @@ class Image {
 		
 		//suppression des 0 et raccourcissement du vecteur, le tout dans Vect_out
 		int *Vect_out = NULL;
-		suppression_zeros(this->Vecteur128, Vect_out, &nbOut);//nbOut doit réduire de 2 si on enlève les 0
+		suppression_zeros(this->Vecteur128, Vect_out, &nbOut);//nbOut doit réduire si on enlève les 0
 		//on a le resultat final dans Vect_out
 		
 		//on concatène Vecteur out au bout de VecteursR/G/B, précédé d'un marqueur indiquant le nombre de valeurs par vecteur
@@ -384,7 +385,7 @@ class Image {
     }
 
 	
-	void EcritureFinal_jpg(int *Vecteur){//Dosda
+	void EcritureFinal_jpg(int *Vecteur){
 		//Ecriture fichier en jpg
 		
 		std::cout << "Ecriture faite\n";
@@ -428,6 +429,54 @@ class Image {
 		
 		Obj[k][l]=linea[pos];
 		cout << "ZigZag Inverse fait\n";
+	}
+	
+	
+	void writeVect(int *Vect){
+		
+		ofstream fichier; //alloc d'un fichier
+		fichier.open("CompressedVector.txt");//ouverture du fichier
+		
+		int i=1;//notre compteur
+		int cpt=0;//compteur cumulé
+		
+		//RED
+		int nbelem = Vect[0];
+		fichier << Vect[0] << " ";
+		while(cpt<nbelem){
+			cout << i << " " << cpt << " " << Vect[i] << endl;
+			fichier << Vect[i] << " " << Vect[i+1] << " ";//on ecrit deux cases
+			cpt+=Vect[i];
+			i+=2;//on tape 2 cases plus loin au prochain tour
+			
+		}
+		cout << i << " " << cpt << " " << Vect[i] << endl;
+		//GREEN
+		nbelem = Vect[i];
+		fichier << Vect[i] << " ";
+		i++;cpt=0;//réinit du compteur cumulé
+		while(cpt<nbelem){
+			cout << i << " " << cpt << " " << Vect[i] << endl;
+			fichier << Vect[i] << " " << Vect[i+1] << " ";
+			cpt+=Vect[i];
+			i+=2;
+		}
+		cout << i << " " << cpt << " " << Vect[i] << endl;
+		//BLUE
+		nbelem = Vect[i];
+		fichier << Vect[i] << " ";
+		i++;cpt=0;//réinit du compteur cumulé
+		while(cpt<nbelem){
+			cout << i << " " << cpt << " " << Vect[i] << endl;
+			fichier << Vect[i] << " " << Vect[i+1] << " ";
+			cpt+=Vect[i];
+			i+=2;
+		}
+		
+		fichier.close();//fermeture du fichier
+	}
+	void readVect(int *Vect){
+		
 	}
 	
 	// ------------------- PUBLIC ----------------------
@@ -549,18 +598,17 @@ class Image {
 			fuuusion(this->VecteursR,nbR,this->VecteursG,nbG,this->VecteursB,nbB,this->Vecteur);
 		
 			//on ecrit Vecteur dans un fichier
-			char *nom_fichierVect = new char[50];
-			//ecritVect(this->Vecteur, nomfichierVect);
+			writeVect(this->Vecteur);
 			
-			cout << "compression faite, fichier ecrit : " << nom_fichierVect << endl;
+			cout << "compression faite, fichier ecrit "<< endl;
 		}
 
     }
+	
     
 	void decompression(){	//compression à l'envers
-		char *nom_fichierVect = new char[50];
-		//lecture_Vect(nomfichierVect, this->Vecteur);
-		cout << nom_fichierVect << " chargé en mémoire" << endl;
+		readVect(this->Vecteur);
+		cout << " chargé en mémoire" << endl;
 		
 		//Separation de this->vecteur en vecteurs R/G/B
 		//entier indiquant le nb de val de chaque vecteur
