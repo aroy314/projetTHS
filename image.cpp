@@ -90,26 +90,11 @@ class Image {
                         Matrice_dct[i][j] += Matrice8x8[x][y]*(Ci*Cj)/4*cos(((2*x+1)*i*M_PI)/16)*cos(((2*y+1)*j*M_PI)/16);
                     }
             }
-        
-        
-        for (int i=0; i<8; i++)//arondicement des valeurs
+		
+        for (int i=0; i<8; i++)
             for (int j=0; j<8; j++)
-            {
-                Matrice8x8[i][j]=Matrice_dct[i][j];
-            }
-        
-//        for (int i=0; i<8; i++)//arondicement des valeurs
-//            for (int j=0; j<8; j++)
-//            {
-//                if(Matrice_dct[i][j]>0)
-//                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
-//                        Matrice8x8[i][j]=Matrice_dct[i][j];
-//                else
-//                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>-0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
-//                    Matrice8x8[i][j]=Matrice_dct[i][j];
-//            }
-    
-        }
+                Matrice8x8[i][j]=Matrice_dct[i][j];//reatribution de la matrice de travail
+	}
 	
     void dct_2D_Inverse(int **Matrice8x8){
         float **Matrice_dct = new float*[8];
@@ -129,17 +114,6 @@ class Image {
                         Matrice_dct[i][j]+=(1/sqrt(16))*(Matrice8x8[x][y]*Cx*Cy*cos(((2*i+1)*x*M_PI)/16)*cos(((2*j+1)*y*M_PI)/16));
                     }
             }
-//        
-//        for (int i=0; i<8; i++)//arondissement des valeurs
-//            for (int j=0; j<8; j++)
-//            {
-//                if(Matrice_dct[i][j]>0)
-//                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
-//                    Matrice8x8[i][j]=Matrice_dct[i][j];
-//                else
-//                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>-0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
-//                    Matrice8x8[i][j]=Matrice_dct[i][j];
-//            }
 		
         for (int i=0; i<8; i++)
             for (int j=0; j<8; j++)
@@ -187,7 +161,7 @@ class Image {
 		//on decompresse this->Vecteur128
 		decompression_zigzag(this->Vecteur128, Vect_temp, nbIn);
 		
-		//on le met dans une matrice avec zigzag
+		//on le met dans une matrice avec zigzag et on complete de 0
 		zigzag_inverse(this->Matrice8x8, Vect_temp);
 		delete Vect_temp;
 		
@@ -345,11 +319,11 @@ class Image {
 		
 	}
 	
-	void compression_zigzag(int *V1, int* V2, int *nb_elem){//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
+	void compression_zigzag(int *V1, int* V2, int *nb_elem){		//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
 		
 	}
 	
-	void decompression_zigzag(int *V1, int* V2, const int nb_elem){//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
+	void decompression_zigzag(int *V1, int *V2, const int nb_elem){	//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
 		
 	}
 	
@@ -493,7 +467,6 @@ class Image {
 		delete this->Vecteur;
 		delete this->Vecteur128;
 
-		
 		cout << "destruction faite\n";
 		}
 	
@@ -548,7 +521,5 @@ class Image {
 		cout << "decompression faite" << endl;
 	}
 
-	
-	
 };
 
