@@ -311,14 +311,48 @@ class Image {
 		
 		cout << "unfuuusion fait" << endl;
 	}
-	
+
 	void zigzag(int **Matrice8x8, int *Vect){//poisson
 		//lecture de la 88 image
 		//ecriture de Vecteur avec la lecture en zigzag
+
+        int k=0;
+        int l=0;
+        int i=0;
+        
+        while ((k!=7)||(l!=7))
+        {
+            while((k!=0)&&(l!=7))
+                  {
+                      Vect[i++]=Matrice8x8[k][l];
+                      k--;
+                      l++;
+                  }
+                  Vect[i++]=Matrice8x8[k][l];
+                  if(l==7)
+                      k++;
+                  else
+                      l++;
+                  while((k!=7)&&(l!=0))
+                        {
+                            Vect[i++]=Matrice8x8[k][l];
+                            k++;
+                            l--;
+                        }
+                        Vect[i++]=Matrice8x8[k][l];
+                        if(k==7)
+                            l++;
+                        else
+                            k++;
+                        }
+        Vect[i]=Matrice8x8[k][l];
+        
 		
 		cout << "ZigZag fait" << endl;
 		
 	}
+    
+    
     
     void compression_zigzag (int *V1, int *V2, int *nb_elem)//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
     {
@@ -359,8 +393,8 @@ class Image {
 	
 	void zigzag_inverse (int ** Obj,int * linea) {
 		
-		int pos;
-		int k,l;	// k indices lignes, l indice colonnes
+		int pos=0;
+		int k=0,l=0;	// k indices lignes, l indice colonnes
 		
 		for (int i=0 ; i<8 ;i++)
 			for ( int j=0 ; j<8 ; j++)

@@ -118,7 +118,7 @@ int main(int argc, const char * argv[]) {
 //    Matrice[7][5]=147;
 //    Matrice[7][6]=147;
 //    Matrice[7][7]=136;
-//    
+//
 //    int **R = new int*[8];
 //    for (int i = 0; i < 8; i++)
 //        R[i] = new int[8];
@@ -133,21 +133,47 @@ int main(int argc, const char * argv[]) {
 //    
 //
 //    image->separate_RGB(Matrice, 8, R, G, B);
-//    
-//    
+    
+    
+    
 //    for (int i=0; i<8; i++)
 //        for (int j=0; j<8; j++)
 //        {
-//            printf("%d ", R[i][j]);
+//            printf("%d ", Matrice[i][j]);
 //            if(j==7)
 //            {
 //                printf("\n");
 //            }
 //            
 //        }
+//    printf("\n");
+//    printf("\n");
+//    
+//    int *Vect = new int[64];
+//    image->zigzag(Matrice,Vect);
+//    image->zigzag_inverse(Matrice,Vect);
+////
+////    
+//    for (int i=0; i<8; i++)
+//        for (int j=0; j<8; j++)
+//        {
+//            printf("%d ", Matrice[i][j]);
+//            if(j==7)
+//            {
+//                printf("\n");
+//            }
+//
+//        }
 //     printf("\n");
 //     printf("\n");
 //    
+//        for (int i=0; i<64; i++)
+//        {
+//                printf("%d ", Vect[i]);
+//            
+//                }
+    
+//
 //    for (int i=0; i<8; i++)
 //        for (int j=0; j<8; j++)
 //        {
