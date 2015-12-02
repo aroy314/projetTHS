@@ -17,19 +17,21 @@ CImg<int> charge_img(const char* file) {
 void save_img(CImg <int> image, const char* file) {
 	image.save(file);
 }
-/*
+
 CImg <int> ecris_img(int** matrice, const int x, const int y) {
-	CImg <int> image(x, y, 0, 3, 0);
-	for(int i=0; i<x*3; i=i+3){
+	CImg <int> image(x, y, 1, 3);
+	
+	for(int i=0; i<x; i=i+3){
 		for(int j=0; j<y; j++){
-			for (int k=0; k<3; k++){
-				Cimg
-			}
+			image(i, j, 1, -1) = matrice[i][j];
+			image(i, j, 1, 0) = matrice[i+1][j];
+			image(i, j, 1, 1) = matrice[i+2][j];
+			
 		}
 	}
-
+	return image;
 }
-*/
+
 int* Dimensions(CImg<int> image){ //Pour calculer les dimensions de l'image
 	int* tab = new int[2];
 	tab[0] = image.dimx();
@@ -39,7 +41,6 @@ int* Dimensions(CImg<int> image){ //Pour calculer les dimensions de l'image
 
 int** MiseEnMatrice(CImg<int> image, int** matrice, const int x, const int y){
 	
-	//test
 	CImg <int> image_test (x*3,y,0,3);
 	matrice = new int*[x*3];		//Création matrice
 	for (int i=0; i<x*3; i++)
@@ -47,8 +48,20 @@ int** MiseEnMatrice(CImg<int> image, int** matrice, const int x, const int y){
 	
 	for (int i=0; i<x*3; i=i+3){	//Remplissage matrice
 		for (int j=0; j<y; j++){
-			for (int k=0; k<3; k++)
-				matrice[i+k][j]=image(i,j,0,k); 
+			matrice[i][j]=image(i,j,0,0); 
+			matrice[i+1][j]=image(i,j,0,1); 
+			matrice[i+2][j]=image(i,j,0,2); 
+		}
+	}
+	return matrice;
+}
+
+int** Recalage(int** matrice, const int x, const int y){
+
+	for (int i=0; i<x*3; i++){	
+		for (int j=0; j<y; j++){
+			if(matrice[i][j]>255)
+				matrice[i][j]=255;	
 		}
 	}
 	return matrice;
@@ -63,28 +76,27 @@ int** Multiple8(int** matrice, int* l, int* L){ //Mise en carré multiple de 8
 		if (i!=0)
 			x += 8 - i;
 		*L=x;
-	cout << "cas1" << endl;
+		cout << "Cas1" << endl;
 	}
 	else if(x < y){
 		if (j != 0)
 			y += 8 - j;
 		*l=y;
-	cout << "cas2" << endl;
+		cout << "Cas2" << endl;
 	}
-	cout << "tests ok" <<endl;
 	int finalX = *l, finalY=*L;
 	int** matrice8 = new int*[finalX*3];
 	for (int i = 0; i<finalX*3; i++)	//Création nouvelle matrice multiple de 8
 		matrice8[i] = new int[finalY];
-	cout << "alloc ok" <<endl;
 
-	for (int i=0; i<finalX*3; i++)	// Remplissage matrice multiple de 8 (Demander a alex si = ou <=)
-		for (int j=0; j<finalY; j++)
+	for (int i=0; i<finalX*3; i++){	// Remplissage matrice multiple de 8
+		for (int j=0; j<finalY; j++){
 			if(i<(x*3) && j<y)
 				matrice8[i][j] = matrice[i][j];
 			if(i>=(x*3) || j>=y)
 				matrice8[i][j]=0;
-	cout << "remplissage ok" <<endl;
+		}
+}
 	return matrice8;
 
 
@@ -104,20 +116,19 @@ int main()
 	int* l = NULL;
 	int* L = NULL;
 	
-	image = charge_img("lena2.jpg");
+	image = charge_img("lena.jpg");
 	int* tab = Dimensions(image);
 	cout << "X = " << tab[0] << endl << "Y = " << tab[1] << endl;
 	//delete tab;
 	
-	cout << "PTest" << endl;
 	//int x = image.dimx()*3;
 	//int y = image.dimy();
 	l = tab;
 	L = tab+1;
 
 	matrice = MiseEnMatrice(image, matrice, *l, *L);
-//	matrice = Multiple8(matrice, l, L);
-	cout << "Test3" << endl;
+	matrice = Multiple8(matrice, l, L);
+	matrice = Recalage(matrice, *l, *L);
 	
 
 /*	for (int i = 0; i < image.dimx(); i++) {
@@ -129,14 +140,15 @@ int main()
 */
 	for (int i = 0; i < (*l)*3; i=i+3){
 		for (int j = 0; j < *L; j++){
-			//cout << matrice[i][j] << " " << matrice[i+1][j]<< " " << matrice[i+2][j]<< " "  << endl;
-			if(matrice[i][j] > 255 ||matrice[i+1][j] > 255||matrice[i+2][j] > 255){
+		//cout << matrice[i+2][j] << " " << matrice[i+1][j]<< " " << matrice[i+2][j]<< " "  << endl;
+		/*	if(matrice[i][j] > 255 ||matrice[i+1][j] > 255||matrice[i+2][j] > 255){
 			cout << matrice[i][j] << " " << matrice[i+1][j]<< " " << matrice[i+2][j]<< " "  << endl;
 			      cout << " ============ ERROR ======== "<<endl << i << " "<<j<<endl;
-			break;}
+			}*/
 			}}
-
-	save_img(image, "out.jpg");
+	
+	CImg<int> out = ecris_img(matrice, *l, *L);
+	save_img(out, "out2.jpg");
 
 	Free(matrice, l);	
 
