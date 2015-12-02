@@ -176,53 +176,40 @@ class Image {
     
     
     
-    public :
     
-    int compression_zigzag (int * linea, int * comp)
-    {
-        
-        int x=0;
+    void compression_zigzag (int *linea, int *comp, int *X)
+    { 
         int a = 1;
         
-        for (int pos=0; pos<64 ; pos++)
+        for (int pos=0; pos<64 ; pos++) // parcours le tableau
         {
-            
-            if  (linea[pos+1]==linea[pos])
-            {   a++;}
+            if  (linea[pos+1]==linea[pos]&& pos!=63) // compte le nombre de chiffre similaire
+                a++;
             else
             {
-                comp[x] = a ;
-                comp[x+1] =linea[pos];
+                comp[*X] = a ;// attribut les valleurs a la matrice de sortie
+                comp[*X+1] =linea[pos];
                 a = 1 ;
-                x = x + 2;
+                *X+=2; // recupere taille matrice
             }
         }
         
-    
-        
-        for (int i=128-x; i<128 ;i++)
-        {
-            comp[i]=0;
-            printf("%d ",comp[i]);
-        }
-        
-        
-        x=x-1;
-        x=128-x;
-        
-        
-        return x;
     }
     
     
     
+    void decompression_zigzag (int *V1, int *comp, int *X)
+    {
+        int p = 0;
+        int x=*X;
+        
+        for (int i=0; i<x ; i++) //Reatribue les valeurs de base de la matrice 64
+            if (i%2==0)
+                for (int j=0; j<comp[i]; j++)
+                    V1[p++]=comp[i+1];
+    }
     
-    
-    
-    
-    
-    
-    
+
 
     Image(const char * nom_image[]){ //CONSTRUCTEUR
 		
@@ -399,9 +386,9 @@ class Image {
 		
 	//}
 	
-	void decompression_zigzag(int *V1, int* V2){
-		
-	}
+//	void decompression_zigzag(int *V1, int* V2){
+//		
+//	}
 
 };
 
