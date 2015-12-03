@@ -217,14 +217,22 @@ class Image {
 
 	}
 
-	void suppression_zeros(int *V1, int *V2, int *size_vect){
-		if(V1[*size_vect]==0)
-			*size_vect -= 2;
-		//creation du nouveau vecteur
-		V2 = new int[*size_vect];
-		for(int i=0;i<*size_vect;i++)
-			V2[i] = V1[i];
-	}
+    void suppression_zeros(int *V1, int *V2, int *nb_elm){
+        int cpt=0;
+        int size=0;
+        while (cpt<*nb_elm) {
+            cpt+=V1[size];
+            size+=2;
+        }
+        if(V1[size-1]==0){
+            size -= 2;
+            *nb_elm-=V1[size-2];
+        }
+        //creation du nouveau vecteur
+        V2 = new int[size];//Si bug c'est la le probleme vien de la MF
+        for(int i=0;i<size;i++)
+            V2[i] = V1[i];
+    }
 	
 	void fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
 		
