@@ -475,6 +475,7 @@ class Image {
 		
 		fichier.close();//fermeture du fichier
 	}
+	
 	void readVect(int *Vect){
 		
 	}
@@ -593,7 +594,7 @@ class Image {
 					compression8x8(i*8,j*8,this->G,this->VecteursG,&nbG);
 					compression8x8(i*8,j*8,this->B,this->VecteursB,&nbB);
 				}
-			
+			//PROBLEME A CORRIGER ICI AVEC nbRGB et architecture des Vecteurs RGB
 			//mise bout à bout des 3 vecteurs RGB dans Vecteur, séparé par une case indiquant le nb de valeurs dans chacun
 			fuuusion(this->VecteursR,nbR,this->VecteursG,nbG,this->VecteursB,nbB,this->Vecteur);
 		
@@ -607,7 +608,7 @@ class Image {
 	
     
 	void decompression(){	//compression à l'envers
-		readVect(this->Vecteur);
+		//readVect(this->Vecteur);
 		cout << " chargé en mémoire" << endl;
 		
 		//Separation de this->vecteur en vecteurs R/G/B
