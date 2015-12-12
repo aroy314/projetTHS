@@ -71,9 +71,9 @@ class Image {
     void dct_2D(int **Matrice8x8){
 		
 		//allocation d'une matrice de travail
-        int **Matrice_dct = new int*[8];
+        float **Matrice_dct = new float*[8];
         for (int i = 0; i < 8; i++)
-            Matrice_dct[i] = new int[8];
+            Matrice_dct[i]= new float[8];
         
         float Ci;
         float Cj;
@@ -90,26 +90,11 @@ class Image {
                         Matrice_dct[i][j] += Matrice8x8[x][y]*(Ci*Cj)/4*cos(((2*x+1)*i*M_PI)/16)*cos(((2*y+1)*j*M_PI)/16);
                     }
             }
-        
-        
-        for (int i=0; i<8; i++)//arondicement des valeurs
+		
+        for (int i=0; i<8; i++)
             for (int j=0; j<8; j++)
-            {
-                Matrice8x8[i][j]=Matrice_dct[i][j];
-            }
-        
-//        for (int i=0; i<8; i++)//arondicement des valeurs
-//            for (int j=0; j<8; j++)
-//            {
-//                if(Matrice_dct[i][j]>0)
-//                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
-//                        Matrice8x8[i][j]=Matrice_dct[i][j];
-//                else
-//                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>-0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
-//                    Matrice8x8[i][j]=Matrice_dct[i][j];
-//            }
-    
-        }
+                Matrice8x8[i][j]=Matrice_dct[i][j];//reatribution de la matrice de travail
+	}
 	
     void dct_2D_Inverse(int **Matrice8x8){
         float **Matrice_dct = new float*[8];
@@ -129,17 +114,6 @@ class Image {
                         Matrice_dct[i][j]+=(1/sqrt(16))*(Matrice8x8[x][y]*Cx*Cy*cos(((2*i+1)*x*M_PI)/16)*cos(((2*j+1)*y*M_PI)/16));
                     }
             }
-//        
-//        for (int i=0; i<8; i++)//arondissement des valeurs
-//            for (int j=0; j<8; j++)
-//            {
-//                if(Matrice_dct[i][j]>0)
-//                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
-//                    Matrice8x8[i][j]=Matrice_dct[i][j];
-//                else
-//                    (Matrice_dct[i][j]-(int)Matrice_dct[i][j]>-0.5)?Matrice8x8[i][j]=(int)Matrice_dct[i][j]+1:
-//                    Matrice8x8[i][j]=Matrice_dct[i][j];
-//            }
 		
         for (int i=0; i<8; i++)
             for (int j=0; j<8; j++)
@@ -148,6 +122,7 @@ class Image {
 		cout << "DCT2D inverse faite\n";
 
     }
+
 	
 	//fonction de recup d'une matrice NxN et allocation de la 8x8 selon des paramètres x,y (haut gauche de la matrice)
 	void compression8x8(int x, int y, int **matriceNN, int *Vecteur, int *nbV){
@@ -187,7 +162,7 @@ class Image {
 		//on decompresse this->Vecteur128
 		decompression_zigzag(this->Vecteur128, Vect_temp, nbIn);
 		
-		//on le met dans une matrice avec zigzag
+		//on le met dans une matrice avec zigzag et on complete de 0
 		zigzag_inverse(this->Matrice8x8, Vect_temp);
 		delete Vect_temp;
 		
@@ -241,14 +216,22 @@ class Image {
 
 	}
 
-	void suppression_zeros(int *V1, int *V2, int *size_vect){
-		if(V1[*size_vect]==0)
-			*size_vect -= 2;
-		//creation du nouveau vecteur
-		V2 = new int[*size_vect];
-		for(int i=0;i<*size_vect;i++)
-			V2[i] = V1[i];
-	}
+    void suppression_zeros(int *V1, int *V2, int *nb_elm){
+        int cpt=0;
+        int size=0;
+        while (cpt<*nb_elm) {
+            cpt+=V1[size];
+            size+=2;
+        }
+        if(V1[size-1]==0){
+            size -= 2;
+            *nb_elm-=V1[size-2];
+        }
+        //creation du nouveau vecteur
+        V2 = new int[size];//Si bug c'est la le probleme vien de la MF
+        for(int i=0;i<size;i++)
+            V2[i] = V1[i];
+    }
 	
 	void fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
 		
@@ -336,22 +319,78 @@ class Image {
 		
 		cout << "unfuuusion fait" << endl;
 	}
-	
+
 	void zigzag(int **Matrice8x8, int *Vect){//poisson
 		//lecture de la 88 image
 		//ecriture de Vecteur avec la lecture en zigzag
+
+        int k=0;
+        int l=0;
+        int i=0;
+        
+        while ((k!=7)||(l!=7))
+        {
+            while((k!=0)&&(l!=7))
+                  {
+                      Vect[i++]=Matrice8x8[k][l];
+                      k--;
+                      l++;
+                  }
+                  Vect[i++]=Matrice8x8[k][l];
+                  if(l==7)
+                      k++;
+                  else
+                      l++;
+                  while((k!=7)&&(l!=0))
+                        {
+                            Vect[i++]=Matrice8x8[k][l];
+                            k++;
+                            l--;
+                        }
+                        Vect[i++]=Matrice8x8[k][l];
+                        if(k==7)
+                            l++;
+                        else
+                            k++;
+                        }
+        Vect[i]=Matrice8x8[k][l];
+        
 		
 		cout << "ZigZag fait" << endl;
 		
 	}
-	
-	void compression_zigzag(int *V1, int* V2, int *nb_elem){//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
-		
-	}
-	
-	void decompression_zigzag(int *V1, int* V2, const int nb_elem){//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
-		
-	}
+    
+    
+    
+    void compression_zigzag (int *V1, int *V2, int *nb_elem)//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
+    {
+        int a = 1;
+        
+        for (int pos=0; pos<64 ; pos++) // parcours le tableau
+        {
+            if  (V1[pos+1]==V1[pos]&& pos!=63) // compte le nombre de chiffre similaire
+                a++;
+            else
+            {
+                V2[*nb_elem] = a ;// attribut les valleurs a la matrice de sortie
+                V2[*nb_elem+1] =V1[pos];
+                a = 1 ;
+                *nb_elem+=2; // recupere taille matrice
+            }
+        }
+        
+    }
+    
+    void decompression_zigzag (int *V1, int *V2, const int nb_elem)//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
+    {
+        int p = 0;
+        
+        for (int i=0; i<nb_elem ; i++) //Reatribue les valeurs de base de la matrice 64
+            if (i%2==0)
+                for (int j=0; j<V2[i]; j++)
+                    V1[p++]=V2[i+1];
+    }
+
 	
 	void EcritureFinal_jpg(int *Vecteur){//Dosda
 		//Ecriture fichier en jpg
@@ -362,8 +401,8 @@ class Image {
 	
 	void zigzag_inverse (int ** Obj,int * linea) {
 		
-		int pos;
-		int k,l;	// k indices lignes, l indice colonnes
+		int pos=0;
+		int k=0,l=0;	// k indices lignes, l indice colonnes
 		
 		for (int i=0 ; i<8 ;i++)
 			for ( int j=0 ; j<8 ; j++)
@@ -402,10 +441,11 @@ class Image {
 	// ------------------- PUBLIC ----------------------
 
     public :
+
     Image(const char * nom_image[]){ //CONSTRUCTEUR
 		
 		//chargement de l'image et attribution de la taille de la matrice NN
-		charge_img(nom_image,&this->taille);
+		//charge_img(nom_image,&this->taille);
 		
         //allocation des attributs
         this->image = new int *[3*this->taille];
@@ -493,10 +533,8 @@ class Image {
 		delete this->Vecteur;
 		delete this->Vecteur128;
 
-		
 		cout << "destruction faite\n";
 		}
-	
 	
     void compression(){
 		
@@ -520,7 +558,7 @@ class Image {
 		
 			//on ecrit Vecteur dans un fichier
 			char *nom_fichierVect = new char[50];
-			//ecrit_Vect(this->Vecteur, nomfichierVect);
+			//ecritVect(this->Vecteur, nomfichierVect);
 			
 			cout << "compression faite, fichier ecrit : " << nom_fichierVect << endl;
 		}
@@ -548,7 +586,5 @@ class Image {
 		cout << "decompression faite" << endl;
 	}
 
-	
-	
 };
 
