@@ -613,7 +613,6 @@ class Image {
 
     }
 	
-    
 	void decompression(){	//compression à l'envers
 		//readVect(this->Vecteur);
 		cout << " chargé en mémoire" << endl;
