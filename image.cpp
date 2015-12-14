@@ -177,26 +177,23 @@ class Image {
 				matriceNN[x+i][y+j] = this->Matrice8x8[i][j];
 	}
 	
-	void concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on met V2 au bout de V1
-		
-		//on cherche la bonne case
-		int i=0, cpt=0;//compteur de case et compteur cumulé
-		while(cpt < *nb_val1){
-			cpt += V1[i];
-			i += 2;
-		}
-		//i est à la bonne position, on remplit par le nb de valeur à mettre puis le vecteur
-		V1[i] = *nb_val2;
-		i++;
-		while(cpt <= (*nb_val1 + *nb_val2)){ //on rempli jusqu'a avoir assez de valeurs de V1 + V2
-			V1[i]=V2[i];
-			V1[i+1]=V2[i+1];
-			cpt+=V2[i];
-			i+=2;
-		}
-		//on met à jour nb_val1
-		*nb_val1 = cpt;
-	}
+	   void concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on met V2 au bout de V1
+           
+           //on cherche la bonne case
+           int i=0, cpt=0; int size=0;//compteur de case et compteur cumulé
+           while(V1[size]!=0 && V1[size+1]!=0){//on calcule la taille de V1
+               size++;
+           }
+           size++;
+           
+           while(V2[i]!=0 && V2[i]!=0){ //on met a la suite V1 et V2
+               V1[i+size]=V2[i];
+               cpt+=V2[i];
+               i++;
+           }
+           *nb_val1=*nb_val1+*nb_val2;
+       }
+
 	
 	void deconcatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on attribue un vecteur issu de V1 à V2, et on slide le V1 vers la gauche du nb de valeurs récupérées
 		
@@ -240,43 +237,51 @@ class Image {
 		}
 	}
 	
-	void fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
-		
-		int i=1;//notre compteur
-		int cpt=0;//compteur cumulé
-		int cptVect=0;//compteur cumulé des 3 vect
-		//RED
-		V[0]=nbR;
-		while(cpt<nbR){
-			V[i] = R[i];	//qté
-			V[i+1] = V[i+1];//valeur
-			i+=2;
-			cpt+=V[i+1];
-		}
-		//GREEN
-		V[i]=nbG;
-		i++;
-		cptVect+=cpt;
-		cpt=0;//réinit du compteur cumulé
-		while(cpt<nbG){
-			V[i] = R[i];	//qté
-			V[i+1] = V[i+1];//valeur
-			i+=2;
-			cpt+=V[i+1];
-		}
-		//BLUE
-		V[i]=nbB;
-		i++;
-		cpt=0;//réinit du compteur cumulé
-		while(cpt<nbB){
-			V[i] = R[i];	//qté
-			V[i+1] = V[i+1];//valeur
-			i+=2;
-			cpt+=V[i+1];
-		}
-		cptVect+=cpt;
-		cout << "Vecteur Final : " << "nb de cases : " << i << endl << "nb de valeurs : " << cptVect << endl;
-	}
+    
+    void fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
+        
+        int i=1;//notre compteur
+        int j=0;
+        int cpt=0;//compteur cumulé
+        int cptVect=0;//compteur cumulé des 3 vect
+        //RED
+        V[0]=nbR;
+        while(cpt<nbR){
+            V[i] = R[j];	//qté
+            V[i+1] = R[j+1];//valeur
+            cpt+=R[j];
+            i+=2;
+            j+=2;
+        }
+        //GREEN
+        V[i]=nbG;
+        i++;
+        cptVect+=cpt;
+        cpt=0; j=0;//réinit du compteur cumulé
+        while(cpt<nbG){
+            V[i] = G[j];	//qté
+            V[i+1] = G[j+1];//valeur
+            cpt+=G[j];
+            i+=2;
+            j+=2;
+        }
+        //BLUE
+        V[i]=nbB;
+        i++;
+        cptVect+=cpt;
+        cpt=0; j=0;//réinit du compteur cumulé
+        while(cpt<nbB){
+            V[i] = B[j];	//qté
+            V[i+1] = B[j+1];//valeur
+            cpt+=B[j];
+            i+=2;
+            j+=2;
+        }
+        
+        cptVect+=cpt;
+        cout << "Vecteur Final : " << "nb de cases : " << i << endl << "nb de valeurs : " << cptVect << endl;
+    }
+
 	
 	void unfuuusion(int *V, int *R, int *nbR, int *G, int *nbG, int *B, int *nbB){	//Separation de V en R/G/B
 		
@@ -380,7 +385,7 @@ class Image {
 		
 		cout << endl << "compression de Vecteur faite" << endl;
 	}
-	
+
     void decompression_zigzag (int *V1, int *V2, const int nb_elem)//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
     {
         int p = 0;
