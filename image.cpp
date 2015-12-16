@@ -18,7 +18,8 @@ class Image {
 	// ------------------- PRIVATE ----------------------
 	private :
 	// ------------------- ATTRIBUTS --------------------
-    int taille;             //img squared size
+    int largeur;            //largeur (i)
+    int hauteur;			//hauteur (j)
     int **image = NULL;     //image de base
     int **R = NULL;         //two dimensions matrix
     int **G = NULL;
@@ -502,19 +503,19 @@ class Image {
 		//charge_img(nom_image,&this->taille);
 		
         //allocation des attributs
-        this->image = new int *[3*this->taille];
-        this->R     = new int *[this->taille];
-        this->G     = new int *[this->taille];
-        this->B     = new int *[this->taille];
+        this->image = new int *[3*this->largeur];
+        this->R     = new int *[this->largeur];
+        this->G     = new int *[this->largeur];
+        this->B     = new int *[this->largeur];
 		
-		for (int i=0;i<3*this->taille;i++) {
-			this->image[i] = new int[this->taille];
+		for (int i=0;i<3*this->largeur;i++) {
+			this->image[i] = new int[this->hauteur];
 		}
 		
-        for (int i=0;i<this->taille;i++) {
-            this->R[i]     = new int[this->taille];
-            this->G[i]     = new int[this->taille];
-            this->B[i]     = new int[this->taille];
+        for (int i=0;i<this->largeur;i++) {
+            this->R[i]     = new int[this->hauteur];
+            this->G[i]     = new int[this->hauteur];
+            this->B[i]     = new int[this->hauteur];
         }
 		
         this->Matrice8x8 = new int *[8];
@@ -526,14 +527,14 @@ class Image {
         }
 		
 		this->Vecteur128	= new int[128];
-		this->VecteursR		= new int[2*this->taille*this->taille];
-		this->VecteursG		= new int[2*this->taille*this->taille];
-		this->VecteursB		= new int[2*this->taille*this->taille];
-		this->Vecteur		= new int[6*this->taille*this->taille+3]; //contiens les vect RGB + nb de val dans chacun à chaque debut de vect
+		this->VecteursR		= new int[2*this->largeur*this->hauteur];
+		this->VecteursG		= new int[2*this->largeur*this->hauteur];
+		this->VecteursB		= new int[2*this->largeur*this->hauteur];
+		this->Vecteur		= new int[6*this->largeur*this->hauteur+3]; //contiens les vect RGB + nb de val dans chacun à chaque debut de vect
 		
 		//attribution des matrices RGB selon la matrice image
-		for(int i=0;i<this->taille;i=i+3)
-			for(int j=0;j<this->taille;i++){
+		for(int i=0;i<this->largeur;i=i+3)
+			for(int j=0;j<this->hauteur;i++){
 				this->R[i][j] = this->image[i][j];
 				this->G[i][j] = this->image[i+1][j];
 				this->B[i][j] = this->image[i+2][j];
@@ -558,13 +559,13 @@ class Image {
     ~Image(){ //DESTRUCTEUR
 		//destruction des attributs
 		
-		for (int i=0;i<this->taille;i++) {
+		for (int i=0;i<this->largeur;i++) {
 			delete this->R[i];
 			delete this->G[i];
 			delete this->B[i];
 		}
 		
-		for (int i=0;i<this->taille*3;i++) {
+		for (int i=0;i<this->largeur*3;i++) {
 			delete this->image[i];
 		}
 		
@@ -592,7 +593,7 @@ class Image {
 	
     void compression(){
 		
-		if(this->taille%8==0)//test tout bête
+		if(this->largeur%8!=0 || this->hauteur%8!=0)//test tout bête
 			cout << "Erreur dans la taille des matrices : pas multiple de 8" << endl;
 		else {
 		
@@ -600,8 +601,8 @@ class Image {
 			int nbR=0, nbG=0, nbB=0;
 		
 			//pour R, G et B :
-			for(int i=0;i<this->taille/8;i++)
-				for(int j=0;j<this->taille/8;j++){
+			for(int i=0;i<this->largeur/8;i++)
+				for(int j=0;j<this->hauteur/8;j++){
 					compression8x8(i*8,j*8,this->R,this->VecteursR,&nbR);
 					compression8x8(i*8,j*8,this->G,this->VecteursG,&nbG);
 					compression8x8(i*8,j*8,this->B,this->VecteursB,&nbB);
@@ -628,8 +629,8 @@ class Image {
 		unfuuusion(this->Vecteur,this->VecteursR,&nbR,this->VecteursG,&nbG,this->VecteursB,&nbB);
 		
 		//repartition de chaque vecteursRGB dans des vecteurs 88 puis mise en matrice et traitement
-		for(int i=0;i<this->taille/8;i++)
-			for(int j=0;j<this->taille/8;j++){
+		for(int i=0;i<this->largeur/8;i++)
+			for(int j=0;j<this->hauteur/8;j++){
 				decompression8x8(i*8,j*8,this->R,this->VecteursR,&nbR);
 				decompression8x8(i*8,j*8,this->G,this->VecteursG,&nbG);
 				decompression8x8(i*8,j*8,this->B,this->VecteursB,&nbB);
