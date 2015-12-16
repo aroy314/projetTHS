@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include "OutilsLib.h"
 #include "BmpLib.h"
-#define NBLIG 300
-#define NBCOL 200
+#include "BmpLibfri.h"
 
 using namespace std;
 
@@ -39,37 +38,37 @@ void cree3matrices(DonneesImageRGB *image, int** rouge, int** vert, int** bleu)
 		}
 }
 
-void creeImage(DonneesImageRGB *image, int** rouge, int** vert, int** bleu, int* largeur, int* hauteur)
+void creeImage(tabRVB tabRVB, int** rouge, int** vert, int** bleu, int x, int y)
 {
 	int i,j,k=0;
-	for (i=0; i<*largeur; i++)
-		for (j=0; j<*hauteur;j++)
+	for (i=0; i<x; i++)
+		for (j=0; j<y;j++)
 		{
-			image->donneesRGB[k]=bleu[i][j];
+			tabRVB[k]=bleu[i][j];
 			k++;
-			image->donneesRGB[k]=vert[i][j];
+			tabRVB[k]=vert[i][j];
 			k++;
-			image->donneesRGB[k]=rouge[i][j];
+			tabRVB[k]=rouge[i][j];
 			k++;
 		}
 }
 
 //Mise en carré multiple de 8
-int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* hauteur){	
-	int i = (image->largeurImage) % 8, j = (image->hauteurImage) % 8;
-
-	if(*largeur > *hauteur){
-		if (i!=0)
+int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* hauteur, int* eps){	
+	int i = (*largeur) % 8, j = (*hauteur) % 8;
+//	if(*largeur > *hauteur){
+		if (i != 0){
 			*largeur += 8 - i;
-		*hauteur=*largeur;
-		cout << "Cas 1" << endl;
+			*eps = 8 - i;
+//		*hauteur=*largeur;
+		cout << "Cas 1 :" << endl;
 		cout << "Largeur : " << *largeur << endl << "Hauteur : " << *hauteur << endl << endl;
 	}
-	else if(*largeur < *hauteur){
-		if (j != 0)
+//	else if(*largeur < *hauteur){
+		if (j != 0){
 			*hauteur += 8 - j;
-		*largeur=*hauteur;
-		cout << "Cas 2" << endl;
+//		*largeur=*hauteur;
+		cout << "Cas 2 :" << endl;
 		cout << "Largeur : " << *largeur << endl << "Hauteur : " << *hauteur << endl << endl;
 	}
 
@@ -90,6 +89,10 @@ int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* haute
 		for (q=0; q<image->hauteurImage;q++)
 		{
 			matrice8[p][q]=matrice[p][q];
+			//Debuggage
+			if(matrice8[p][q] != matrice[p][q]){
+			cout << matrice8[p][q] << " = " << matrice[p][q] << endl;
+			}
 		}	
 
 	return matrice8;
@@ -97,9 +100,13 @@ int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* haute
 
 int main(void)
 {
+	//Déclaration images
 	DonneesImageRGB *image=NULL;
 	DonneesImageRGB *image8=NULL;
-    	
+	
+	//Déclaration recadrage
+	int* eps=NULL;	
+
 	//Déclaration matrices
    	int** rouge=NULL; 
 	int** vert=NULL; 
@@ -108,19 +115,21 @@ int main(void)
 	//Déclarations nouvelles dimensions
 	int* largeur=NULL;
 	int* hauteur=NULL;
-	int* tab = new int[2];
+	int* tab = new int[3];
 	
 	cout << "========== Lecture de l'image =========" << endl << endl;
     	
-	image = lisBMPRGB("champ.bmp");
+	image = lisBMPRGB("universe.bmp");
+	
 	cout << "Largeur : " << image->largeurImage << endl << "Hauteur : " << image->hauteurImage << endl << endl;	
 	
-	tab[0]=image->largeurImage;
-	tab[1]=image->hauteurImage;
-	largeur=tab;
-	hauteur=tab+1;
-
-
+	int x = tab[0] = image->largeurImage;
+	int y = tab[1] = image->hauteurImage;
+	tab[2] = 0;
+	largeur = tab;
+	hauteur = tab+1;
+	eps = tab+2;
+	
 	//Allocation matrices
 	rouge = new int*[image->largeurImage];
 	for (int i=0; i<image->largeurImage; i++)
@@ -134,22 +143,18 @@ int main(void)
 	for (int i=0; i<image->largeurImage; i++)
 		bleu[i] = new int[image->hauteurImage];
 	
-	cout << "test1" << endl;
-	
 	cree3matrices(image, rouge, vert, bleu);
 	
-	cout << "test2" << endl;
+	rouge = multiple8(image, rouge, largeur, hauteur, eps);
+	vert = multiple8(image, vert, largeur, hauteur, eps);
+	bleu = multiple8(image, bleu, largeur, hauteur, eps);
 	
-	rouge = multiple8(image, rouge, largeur, hauteur);
-	vert = multiple8(image, vert, largeur, hauteur);
-	bleu = multiple8(image, bleu, largeur, hauteur);
-	
-	cout << "test3" << endl;
+	unsigned char* tabRVB=NULL;
+	tabRVB = (unsigned char*)calloc(1, sizeof(unsigned char)*(*largeur)*(*hauteur)*3);
 
-	creeImage(image8,rouge, vert, bleu, largeur, hauteur);
+	creeImage(tabRVB, rouge, vert, bleu, x, y);
 	
-	cout << "========== Ecriture de l'image =========" << endl << endl;
+	cout << "========== Ecriture de l'image =========" << endl;
 	
-	ecrisBMPRGB_Dans(image,"out.bmp");
-
+	ecrisImageRVB("out", tabRVB, largeur, hauteur, eps);
 }
