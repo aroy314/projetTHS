@@ -7,22 +7,6 @@
 
 using namespace std;
 
-
-void alloueMatrice(int** rouge, int** vert, int** bleu){
-	//Allocation matrices
-	rouge = new int*[NBLIG];
-	for (int i=0; i<NBLIG; i++)
-		rouge[i] = new int[NBCOL];
-
-	vert = new int*[NBLIG];
-	for (int i=0; i<NBLIG; i++)
-		vert[i] = new int[NBCOL];
-	
-	bleu = new int*[NBLIG];
-	for (int i=0; i<NBLIG; i++)
-		bleu[i] = new int[NBCOL];
-}
-
 void cree3matrices(DonneesImageRGB *image, int** rouge, int** vert, int** bleu)
 {
 	int i,j,k=0;
@@ -56,18 +40,14 @@ void creeImage(tabRVB tabRVB, int** rouge, int** vert, int** bleu, int x, int y)
 //Mise en carré multiple de 8
 int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* hauteur, int* eps){	
 	int i = (*largeur) % 8, j = (*hauteur) % 8;
-//	if(*largeur > *hauteur){
 		if (i != 0){
 			*largeur += 8 - i;
 			*eps = 8 - i;
-//		*hauteur=*largeur;
 		cout << "Cas 1 :" << endl;
 		cout << "Largeur : " << *largeur << endl << "Hauteur : " << *hauteur << endl << endl;
 	}
-//	else if(*largeur < *hauteur){
 		if (j != 0){
 			*hauteur += 8 - j;
-//		*largeur=*hauteur;
 		cout << "Cas 2 :" << endl;
 		cout << "Largeur : " << *largeur << endl << "Hauteur : " << *hauteur << endl << endl;
 	}
@@ -89,10 +69,6 @@ int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* haute
 		for (q=0; q<image->hauteurImage;q++)
 		{
 			matrice8[p][q]=matrice[p][q];
-			//Debuggage
-			if(matrice8[p][q] != matrice[p][q]){
-			cout << matrice8[p][q] << " = " << matrice[p][q] << endl;
-			}
 		}	
 
 	return matrice8;
@@ -100,9 +76,8 @@ int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* haute
 
 int main(void)
 {
-	//Déclaration images
+	//Déclaration image
 	DonneesImageRGB *image=NULL;
-	DonneesImageRGB *image8=NULL;
 	
 	//Déclaration recadrage
 	int* eps=NULL;	
@@ -119,7 +94,7 @@ int main(void)
 	
 	cout << "========== Lecture de l'image =========" << endl << endl;
     	
-	image = lisBMPRGB("universe.bmp");
+	image = lisBMPRGB("img/champ2.bmp");
 	
 	cout << "Largeur : " << image->largeurImage << endl << "Hauteur : " << image->hauteurImage << endl << endl;	
 	
