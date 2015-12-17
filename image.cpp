@@ -147,10 +147,10 @@ class Image {
 		
 		//suppression des 0 et raccourcissement du vecteur, le tout dans Vect_out
 		int *Vect_out = NULL;
-		suppression_zeros(this->Vecteur128, Vect_out, &nbOut);//nbOut doit réduire si on enlève les 0
+		suppression_zeros(this->Vecteur128, &Vect_out, &nbOut);//nbOut doit réduire si on enlève les 0
 		//on a le resultat final dans Vect_out
 		
-		//on concatène Vecteur out au bout de VecteursR/G/B, précédé d'un marqueur indiquant le nombre de valeurs par vecteur
+		//on concatène Vect_out au bout de Vecteur, précédé d'un marqueur indiquant le nombre de valeurs par vecteur
 		concatVect(Vecteur, nbV, Vect_out, &nbOut);
 		delete Vect_out;
 	}
@@ -178,23 +178,28 @@ class Image {
 				matriceNN[x+i][y+j] = this->Matrice8x8[i][j];
 	}
 	
-	   void concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on met V2 au bout de V1
-           
-           //on cherche la bonne case
-           int i=0, cpt=0; int size=0;//compteur de case et compteur cumulé
-           while(V1[size]!=0 && V1[size+1]!=0){//on calcule la taille de V1
-               size++;
-           }
-           size++;
-           
-           while(V2[i]!=0 && V2[i]!=0){ //on met a la suite V1 et V2
-               V1[i+size]=V2[i];
-               cpt+=V2[i];
-               i++;
-           }
-           *nb_val1=*nb_val1+*nb_val2;
-       }
-
+	void concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on met V2 au bout de V1
+		
+		int test=0;
+		int i=0;
+		while (test < *nb_val1) {
+			test+=V1[i];
+			i+=2;
+		}
+		
+		test=0;
+		int j=0;
+		while (test < *nb_val2) {
+			test+=V2[j];
+			j+=2;
+		}
+		
+		for (int k=0; k<j; k++)
+			V1[i+k]=V2[k];
+		
+		*nb_val1=*nb_val1+*nb_val2;
+		
+	}
 	
 	void deconcatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on attribue un vecteur issu de V1 à V2, et on slide le V1 vers la gauche du nb de valeurs récupérées
 		
@@ -215,7 +220,7 @@ class Image {
 
 	}
 
-	void suppression_zeros(int *V1, int *V2, int *nb_elem){
+	void suppression_zeros(int *V1, int **V2, int *nb_elem){
 		int i=0;
 		int cpt=0;
 		int size=0;
@@ -228,19 +233,18 @@ class Image {
 			*nb_elem-=V1[size];
 		}
 		//creation du nouveau vecteur
-		V2 = new int[size];//Si bug c'est la
+		*V2 = new int[size];
 		cpt=0;i=0;
 		while(cpt<*nb_elem){
-			V2[i] = V1[i];
-			V2[i+1] = V1[i+1];
+			(*V2)[i] = V1[i];
+			(*V2)[i+1] = V1[i+1];
 			cpt+=V1[i];
 			i+=2;
 		}
 	}
 	
-    
     void fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
-        
+		
         int i=1;//notre compteur
         int j=0;
         int cpt=0;//compteur cumulé
@@ -367,7 +371,7 @@ class Image {
 		cout << endl << "ZigZag fait" << endl;
 	}
 
-	void compression_zigzag (int *V1, int *V2, int *nb_elem){ //V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
+	void compression_zigzag (int *V1, int *V2, int *nb_elem){//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
 		int a = 1, cpt=0;
 		
 		for (int pos=0; pos<64 ; pos++){ // parcours le tableau
@@ -384,9 +388,9 @@ class Image {
 		for (int i=0;i<cpt;i+=2)
 			*nb_elem += V2[i];
 		
-		cout << endl << "compression de Vecteur faite" << endl;
+		cout << "compression de Vecteur faite" << endl << "Nb d'elements : " << *nb_elem << endl;
 	}
-
+	
     void decompression_zigzag (int *V1, int *V2, const int nb_elem)//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
     {
         int p = 0;
