@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include <math.h>
 #include "image.hpp"
 
@@ -17,7 +18,8 @@ class Image {
 	// ------------------- PRIVATE ----------------------
 	private :
 	// ------------------- ATTRIBUTS --------------------
-    int taille;             //img squared size
+    int largeur;            //largeur (i)
+    int hauteur;			//hauteur (j)
     int **image = NULL;     //image de base
     int **R = NULL;         //two dimensions matrix
     int **G = NULL;
@@ -45,22 +47,22 @@ class Image {
     }
     
     // Application de la phase de quantification sur chacune des matrices
-    void quantification(int ** Obj) {					   // on récupère notre matrice 8x8
-        int k,l;
-        for(k=0;k<8;k++)					 // parcourt lignes
-            for (l=0;l<8;l++)				// parcourt colonnes
-                Obj[k][l] = Obj[k][l]/this->Q[k][l];    // divise notre matrice 8x8 par l'objet Q, membre à membre
-        
-        std::cout << "quantification faite\n";
-
-    }
-    
+	void quantification(int ** Obj) {		// on récupère notre matrice 8x8
+		int k,l;
+		for(k=0;k<8;k++)					// parcourt lignes
+			for (l=0;l<8;l++)				// parcourt colonnes
+				Obj[k][l] = (int) (Obj[k][l]/this->Q[k][l]);    // divise notre matrice 8x8 par l'objet Q, membre à membre
+		
+		cout << endl << "quantification faite\n";
+		
+	}
+	
         // Application de la phase de quantification inverse sur chacune des matrices
-    void quantification_inv(int ** Obj) {					   // on récupère notre matrice 8x8
+    void quantification_inv(int ** Obj) {	// on récupère notre matrice 8x8
         int k,l;
-        for(k=0;k<8;k++)					 // parcourt lignes
+        for(k=0;k<8;k++)					// parcourt lignes
             for (l=0;l<8;l++)				// parcourt colonnes
-                Obj[k][l] = Obj[k][l]*this->Q[k][l];    // multiplie notre matrice 8x8 par l'objet Q, membre à membre
+                Obj[k][l] = (int) (Obj[k][l]*this->Q[k][l]);    // multiplie notre matrice 8x8 par l'objet Q, membre à membre
         std::cout << "quantification inverse faite\n";
     }
 	
@@ -68,42 +70,42 @@ class Image {
 		
 	}
 	
-    void dct_2D(int **Matrice8x8){
+	void dct_2D(int **Matrice8x8){
 		
 		//allocation d'une matrice de travail
-        float **Matrice_dct = new float*[8];
-        for (int i = 0; i < 8; i++)
-            Matrice_dct[i]= new float[8];
-        
-        float Ci;
-        float Cj;
-        
-        for (int i=0; i<8; i++)
-            for (int j=0; j<8; j++){
-				Matrice_dct[i][j] = 0;
-                for (int x=0; x<8; x++)
-                    for (int y=0; y<8; y++)
-                    {
-                        (i==0) ? Ci=1/sqrt(2): Ci=1;
-                        (j==0) ? Cj=1/sqrt(2): Cj=1;
-                        
-                        Matrice_dct[i][j] += Matrice8x8[x][y]*(Ci*Cj)/4*cos(((2*x+1)*i*M_PI)/16)*cos(((2*y+1)*j*M_PI)/16);
-                    }
-            }
+		float **Matrice_dct = new float*[8];
+		for (int i = 0; i < 8; i++)
+			Matrice_dct[i]= new float[8];
 		
-        for (int i=0; i<8; i++)
-            for (int j=0; j<8; j++)
-                Matrice8x8[i][j]=Matrice_dct[i][j];//reatribution de la matrice de travail
+		float Ci;
+		float Cj;
+		
+		for (int i=0; i<8; i++)
+			for (int j=0; j<8; j++){
+				Matrice_dct[i][j] = 0;
+				for (int x=0; x<8; x++)
+					for (int y=0; y<8; y++)
+					{
+						(i==0) ? Ci=1/sqrt(2): Ci=1;
+						(j==0) ? Cj=1/sqrt(2): Cj=1;
+						
+						Matrice_dct[i][j] += Matrice8x8[x][y]*(Ci*Cj)/4*cos(((2*x+1)*i*M_PI)/16)*cos(((2*y+1)*j*M_PI)/16);
+					}
+			}
+		
+		for (int i=0; i<8; i++)
+			for (int j=0; j<8; j++)
+				Matrice8x8[i][j]=Matrice_dct[i][j];//reatribution de la matrice de travail
 	}
 	
     void dct_2D_Inverse(int **Matrice8x8){
         float **Matrice_dct = new float*[8];
         for (int i = 0; i < 8; i++)
             Matrice_dct[i] = new float[8];
-        
+		
         float Cx;
         float Cy;
-        
+		
         for (int i=0; i<8; i++)
             for (int j=0; j<8; j++){
 				Matrice_dct[i][j] = 0;
@@ -145,7 +147,7 @@ class Image {
 		
 		//suppression des 0 et raccourcissement du vecteur, le tout dans Vect_out
 		int *Vect_out = NULL;
-		suppression_zeros(this->Vecteur128, Vect_out, &nbOut);//nbOut doit réduire de 2 si on enlève les 0
+		suppression_zeros(this->Vecteur128, Vect_out, &nbOut);//nbOut doit réduire si on enlève les 0
 		//on a le resultat final dans Vect_out
 		
 		//on concatène Vecteur out au bout de VecteursR/G/B, précédé d'un marqueur indiquant le nombre de valeurs par vecteur
@@ -176,26 +178,23 @@ class Image {
 				matriceNN[x+i][y+j] = this->Matrice8x8[i][j];
 	}
 	
-	void concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on met V2 au bout de V1
-		
-		//on cherche la bonne case
-		int i=0, cpt=0;//compteur de case et compteur cumulé
-		while(cpt < *nb_val1){
-			cpt += V1[i];
-			i += 2;
-		}
-		//i est à la bonne position, on remplit par le nb de valeur à mettre puis le vecteur
-		V1[i] = *nb_val2;
-		i++;
-		while(cpt <= (*nb_val1 + *nb_val2)){ //on rempli jusqu'a avoir assez de valeurs de V1 + V2
-			V1[i]=V2[i];
-			V1[i+1]=V2[i+1];
-			cpt+=V2[i];
-			i+=2;
-		}
-		//on met à jour nb_val1
-		*nb_val1 = cpt;
-	}
+	   void concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on met V2 au bout de V1
+           
+           //on cherche la bonne case
+           int i=0, cpt=0; int size=0;//compteur de case et compteur cumulé
+           while(V1[size]!=0 && V1[size+1]!=0){//on calcule la taille de V1
+               size++;
+           }
+           size++;
+           
+           while(V2[i]!=0 && V2[i]!=0){ //on met a la suite V1 et V2
+               V1[i+size]=V2[i];
+               cpt+=V2[i];
+               i++;
+           }
+           *nb_val1=*nb_val1+*nb_val2;
+       }
+
 	
 	void deconcatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on attribue un vecteur issu de V1 à V2, et on slide le V1 vers la gauche du nb de valeurs récupérées
 		
@@ -216,60 +215,74 @@ class Image {
 
 	}
 
-    void suppression_zeros(int *V1, int *V2, int *nb_elm){
-        int cpt=0;
-        int size=0;
-        while (cpt<*nb_elm) {
-            cpt+=V1[size];
-            size+=2;
-        }
-        if(V1[size-1]==0){
-            size -= 2;
-            *nb_elm-=V1[size-2];
-        }
-        //creation du nouveau vecteur
-        V2 = new int[size];//Si bug c'est la le probleme vien de la MF
-        for(int i=0;i<size;i++)
-            V2[i] = V1[i];
-    }
-	
-	void fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
-		
-		int i=1;//notre compteur
-		int cpt=0;//compteur cumulé
-		int cptVect=0;//compteur cumulé des 3 vect
-		//RED
-		V[0]=nbR;
-		while(cpt<nbR){
-			V[i] = R[i];	//qté
-			V[i+1] = V[i+1];//valeur
-			i+=2;
-			cpt+=V[i+1];
+	void suppression_zeros(int *V1, int *V2, int *nb_elem){
+		int i=0;
+		int cpt=0;
+		int size=0;
+		while (cpt<*nb_elem) {
+			cpt+=V1[size];
+			size+=2;
 		}
-		//GREEN
-		V[i]=nbG;
-		i++;
-		cptVect+=cpt;
-		cpt=0;//réinit du compteur cumulé
-		while(cpt<nbG){
-			V[i] = R[i];	//qté
-			V[i+1] = V[i+1];//valeur
-			i+=2;
-			cpt+=V[i+1];
+		if(V1[size-1]==0){
+			size -= 2;
+			*nb_elem-=V1[size];
 		}
-		//BLUE
-		V[i]=nbB;
-		i++;
-		cpt=0;//réinit du compteur cumulé
-		while(cpt<nbB){
-			V[i] = R[i];	//qté
-			V[i+1] = V[i+1];//valeur
+		//creation du nouveau vecteur
+		V2 = new int[size];//Si bug c'est la
+		cpt=0;i=0;
+		while(cpt<*nb_elem){
+			V2[i] = V1[i];
+			V2[i+1] = V1[i+1];
+			cpt+=V1[i];
 			i+=2;
-			cpt+=V[i+1];
 		}
-		cptVect+=cpt;
-		cout << "Vecteur Final : " << "nb de cases : " << i << endl << "nb de valeurs : " << cptVect << endl;
 	}
+	
+    
+    void fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
+        
+        int i=1;//notre compteur
+        int j=0;
+        int cpt=0;//compteur cumulé
+        int cptVect=0;//compteur cumulé des 3 vect
+        //RED
+        V[0]=nbR;
+        while(cpt<nbR){
+            V[i] = R[j];	//qté
+            V[i+1] = R[j+1];//valeur
+            cpt+=R[j];
+            i+=2;
+            j+=2;
+        }
+        //GREEN
+        V[i]=nbG;
+        i++;
+        cptVect+=cpt;
+        cpt=0; j=0;//réinit du compteur cumulé
+        while(cpt<nbG){
+            V[i] = G[j];	//qté
+            V[i+1] = G[j+1];//valeur
+            cpt+=G[j];
+            i+=2;
+            j+=2;
+        }
+        //BLUE
+        V[i]=nbB;
+        i++;
+        cptVect+=cpt;
+        cpt=0; j=0;//réinit du compteur cumulé
+        while(cpt<nbB){
+            V[i] = B[j];	//qté
+            V[i+1] = B[j+1];//valeur
+            cpt+=B[j];
+            i+=2;
+            j+=2;
+        }
+        
+        cptVect+=cpt;
+        cout << "Vecteur Final : " << "nb de cases : " << i << endl << "nb de valeurs : " << cptVect << endl;
+    }
+
 	
 	void unfuuusion(int *V, int *R, int *nbR, int *G, int *nbG, int *B, int *nbB){	//Separation de V en R/G/B
 		
@@ -320,67 +333,60 @@ class Image {
 		cout << "unfuuusion fait" << endl;
 	}
 
-	void zigzag(int **Matrice8x8, int *Vect){//poisson
+	void zigzag(int **Matrice8x8, int *Vect){
 		//lecture de la 88 image
 		//ecriture de Vecteur avec la lecture en zigzag
-
-        int k=0;
-        int l=0;
-        int i=0;
-        
-        while ((k!=7)||(l!=7))
-        {
-            while((k!=0)&&(l!=7))
-                  {
-                      Vect[i++]=Matrice8x8[k][l];
-                      k--;
-                      l++;
-                  }
-                  Vect[i++]=Matrice8x8[k][l];
-                  if(l==7)
-                      k++;
-                  else
-                      l++;
-                  while((k!=7)&&(l!=0))
-                        {
-                            Vect[i++]=Matrice8x8[k][l];
-                            k++;
-                            l--;
-                        }
-                        Vect[i++]=Matrice8x8[k][l];
-                        if(k==7)
-                            l++;
-                        else
-                            k++;
-                        }
-        Vect[i]=Matrice8x8[k][l];
-        
 		
-		cout << "ZigZag fait" << endl;
+		int k=0;
+		int l=0;
+		int i=0;
 		
+		while ((k!=7)||(l!=7)){
+			while((k!=0)&&(l!=7)){
+				Vect[i++]=Matrice8x8[k][l];
+				k--;
+				l++;
+			}
+			Vect[i++]=Matrice8x8[k][l];
+			if(l==7)
+				k++;
+			else
+				l++;
+			while((k!=7)&&(l!=0)){
+				Vect[i++]=Matrice8x8[k][l];
+				k++;
+				l--;
+			}
+			Vect[i++]=Matrice8x8[k][l];
+			if(k==7)
+				l++;
+			else
+				k++;
+		}
+		Vect[i]=Matrice8x8[k][l];
+		cout << endl << "ZigZag fait" << endl;
 	}
-    
-    
-    
-    void compression_zigzag (int *V1, int *V2, int *nb_elem)//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
-    {
-        int a = 1;
-        
-        for (int pos=0; pos<64 ; pos++) // parcours le tableau
-        {
-            if  (V1[pos+1]==V1[pos]&& pos!=63) // compte le nombre de chiffre similaire
-                a++;
-            else
-            {
-                V2[*nb_elem] = a ;// attribut les valleurs a la matrice de sortie
-                V2[*nb_elem+1] =V1[pos];
-                a = 1 ;
-                *nb_elem+=2; // recupere taille matrice
-            }
-        }
-        
-    }
-    
+
+	void compression_zigzag (int *V1, int *V2, int *nb_elem){ //V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
+		int a = 1, cpt=0;
+		
+		for (int pos=0; pos<64 ; pos++){ // parcours le tableau
+			if (V1[pos+1]==V1[pos] && pos!=63) // compte le nombre de chiffre similaire
+				a++;
+			else {
+				V2[cpt] = a ;// attribut les valleurs a la matrice de sortie
+				V2[cpt+1] = V1[pos];
+				a = 1 ;
+				cpt+=2; // recupere taille matrice
+			}
+		}
+		//on inscrit dans nb_elem la somme des cases paires (nombre d'elements compressés)
+		for (int i=0;i<cpt;i+=2)
+			*nb_elem += V2[i];
+		
+		cout << endl << "compression de Vecteur faite" << endl;
+	}
+
     void decompression_zigzag (int *V1, int *V2, const int nb_elem)//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
     {
         int p = 0;
@@ -392,7 +398,7 @@ class Image {
     }
 
 	
-	void EcritureFinal_jpg(int *Vecteur){//Dosda
+	void EcritureFinal_jpg(int *Vecteur){
 		//Ecriture fichier en jpg
 		
 		std::cout << "Ecriture faite\n";
@@ -438,6 +444,55 @@ class Image {
 		cout << "ZigZag Inverse fait\n";
 	}
 	
+	
+	void writeVect(int *Vect){
+		
+		ofstream fichier; //alloc d'un fichier
+		fichier.open("CompressedVector.txt");//ouverture du fichier
+		
+		int i=1;//notre compteur
+		int cpt=0;//compteur cumulé
+		
+		//RED
+		int nbelem = Vect[0];
+		fichier << Vect[0] << " ";
+		while(cpt<nbelem){
+			cout << i << " " << cpt << " " << Vect[i] << endl;
+			fichier << Vect[i] << " " << Vect[i+1] << " ";//on ecrit deux cases
+			cpt+=Vect[i];
+			i+=2;//on tape 2 cases plus loin au prochain tour
+			
+		}
+		cout << i << " " << cpt << " " << Vect[i] << endl;
+		//GREEN
+		nbelem = Vect[i];
+		fichier << Vect[i] << " ";
+		i++;cpt=0;//réinit du compteur cumulé
+		while(cpt<nbelem){
+			cout << i << " " << cpt << " " << Vect[i] << endl;
+			fichier << Vect[i] << " " << Vect[i+1] << " ";
+			cpt+=Vect[i];
+			i+=2;
+		}
+		cout << i << " " << cpt << " " << Vect[i] << endl;
+		//BLUE
+		nbelem = Vect[i];
+		fichier << Vect[i] << " ";
+		i++;cpt=0;//réinit du compteur cumulé
+		while(cpt<nbelem){
+			cout << i << " " << cpt << " " << Vect[i] << endl;
+			fichier << Vect[i] << " " << Vect[i+1] << " ";
+			cpt+=Vect[i];
+			i+=2;
+		}
+		
+		fichier.close();//fermeture du fichier
+	}
+	
+	void readVect(int *Vect){
+		
+	}
+	
 	// ------------------- PUBLIC ----------------------
 
     public :
@@ -448,19 +503,19 @@ class Image {
 		//charge_img(nom_image,&this->taille);
 		
         //allocation des attributs
-        this->image = new int *[3*this->taille];
-        this->R     = new int *[this->taille];
-        this->G     = new int *[this->taille];
-        this->B     = new int *[this->taille];
+        this->image = new int *[3*this->largeur];
+        this->R     = new int *[this->largeur];
+        this->G     = new int *[this->largeur];
+        this->B     = new int *[this->largeur];
 		
-		for (int i=0;i<3*this->taille;i++) {
-			this->image[i] = new int[this->taille];
+		for (int i=0;i<3*this->largeur;i++) {
+			this->image[i] = new int[this->hauteur];
 		}
 		
-        for (int i=0;i<this->taille;i++) {
-            this->R[i]     = new int[this->taille];
-            this->G[i]     = new int[this->taille];
-            this->B[i]     = new int[this->taille];
+        for (int i=0;i<this->largeur;i++) {
+            this->R[i]     = new int[this->hauteur];
+            this->G[i]     = new int[this->hauteur];
+            this->B[i]     = new int[this->hauteur];
         }
 		
         this->Matrice8x8 = new int *[8];
@@ -472,14 +527,14 @@ class Image {
         }
 		
 		this->Vecteur128	= new int[128];
-		this->VecteursR		= new int[2*this->taille*this->taille];
-		this->VecteursG		= new int[2*this->taille*this->taille];
-		this->VecteursB		= new int[2*this->taille*this->taille];
-		this->Vecteur		= new int[6*this->taille*this->taille+3]; //contiens les vect RGB + nb de val dans chacun à chaque debut de vect
+		this->VecteursR		= new int[2*this->largeur*this->hauteur];
+		this->VecteursG		= new int[2*this->largeur*this->hauteur];
+		this->VecteursB		= new int[2*this->largeur*this->hauteur];
+		this->Vecteur		= new int[6*this->largeur*this->hauteur+3]; //contiens les vect RGB + nb de val dans chacun à chaque debut de vect
 		
 		//attribution des matrices RGB selon la matrice image
-		for(int i=0;i<this->taille;i=i+3)
-			for(int j=0;j<this->taille;i++){
+		for(int i=0;i<this->largeur;i=i+3)
+			for(int j=0;j<this->hauteur;i++){
 				this->R[i][j] = this->image[i][j];
 				this->G[i][j] = this->image[i+1][j];
 				this->B[i][j] = this->image[i+2][j];
@@ -504,13 +559,13 @@ class Image {
     ~Image(){ //DESTRUCTEUR
 		//destruction des attributs
 		
-		for (int i=0;i<this->taille;i++) {
+		for (int i=0;i<this->largeur;i++) {
 			delete this->R[i];
 			delete this->G[i];
 			delete this->B[i];
 		}
 		
-		for (int i=0;i<this->taille*3;i++) {
+		for (int i=0;i<this->largeur*3;i++) {
 			delete this->image[i];
 		}
 		
@@ -538,7 +593,7 @@ class Image {
 	
     void compression(){
 		
-		if(this->taille%8==0)//test tout bête
+		if(this->largeur%8!=0 || this->hauteur%8!=0)//test tout bête
 			cout << "Erreur dans la taille des matrices : pas multiple de 8" << endl;
 		else {
 		
@@ -546,29 +601,27 @@ class Image {
 			int nbR=0, nbG=0, nbB=0;
 		
 			//pour R, G et B :
-			for(int i=0;i<this->taille/8;i++)
-				for(int j=0;j<this->taille/8;j++){
+			for(int i=0;i<this->largeur/8;i++)
+				for(int j=0;j<this->hauteur/8;j++){
 					compression8x8(i*8,j*8,this->R,this->VecteursR,&nbR);
 					compression8x8(i*8,j*8,this->G,this->VecteursG,&nbG);
 					compression8x8(i*8,j*8,this->B,this->VecteursB,&nbB);
 				}
-			
+			//PROBLEME A CORRIGER ICI AVEC nbRGB et architecture des Vecteurs RGB
 			//mise bout à bout des 3 vecteurs RGB dans Vecteur, séparé par une case indiquant le nb de valeurs dans chacun
 			fuuusion(this->VecteursR,nbR,this->VecteursG,nbG,this->VecteursB,nbB,this->Vecteur);
 		
 			//on ecrit Vecteur dans un fichier
-			char *nom_fichierVect = new char[50];
-			//ecritVect(this->Vecteur, nomfichierVect);
+			writeVect(this->Vecteur);
 			
-			cout << "compression faite, fichier ecrit : " << nom_fichierVect << endl;
+			cout << "compression faite, fichier ecrit "<< endl;
 		}
 
     }
-    
+	
 	void decompression(){	//compression à l'envers
-		char *nom_fichierVect = new char[50];
-		//lecture_Vect(nomfichierVect, this->Vecteur);
-		cout << nom_fichierVect << " chargé en mémoire" << endl;
+		//readVect(this->Vecteur);
+		cout << " chargé en mémoire" << endl;
 		
 		//Separation de this->vecteur en vecteurs R/G/B
 		//entier indiquant le nb de val de chaque vecteur
@@ -576,8 +629,8 @@ class Image {
 		unfuuusion(this->Vecteur,this->VecteursR,&nbR,this->VecteursG,&nbG,this->VecteursB,&nbB);
 		
 		//repartition de chaque vecteursRGB dans des vecteurs 88 puis mise en matrice et traitement
-		for(int i=0;i<this->taille/8;i++)
-			for(int j=0;j<this->taille/8;j++){
+		for(int i=0;i<this->largeur/8;i++)
+			for(int j=0;j<this->hauteur/8;j++){
 				decompression8x8(i*8,j*8,this->R,this->VecteursR,&nbR);
 				decompression8x8(i*8,j*8,this->G,this->VecteursG,&nbG);
 				decompression8x8(i*8,j*8,this->B,this->VecteursB,&nbB);
