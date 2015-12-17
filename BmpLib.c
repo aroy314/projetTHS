@@ -174,7 +174,7 @@ DonneesImageRGB *lisBMPRGB(char *nom)
 
 /* Fonction ecrivant les informations de l'image dans le fichier passe en parametre.
 	Renvoie faux en cas de probleme, vrai sinon */
-bool ecrisBMPRGB_Dans(DonneesImageRGB *donneesImage, char *nom)
+bool ecrisBMPRGB_Dans(DonneesImageRGB *donneesImage, char *nom, int* eps)
 {
 	FILE *fichierBMP;
 	bool toutOK = false;
