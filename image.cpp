@@ -527,7 +527,6 @@ class Image {
         for (int i=0;i<8;i++) {
             this->Matrice8x8[i] = new int[8];
             this->Q[i] = new int[8];
-			
         }
 		
 		this->Vecteur128	= new int[128];
