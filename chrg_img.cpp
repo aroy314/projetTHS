@@ -74,62 +74,54 @@ int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* haute
 	return matrice8;
 }
 
-int main(void)
-{
+void charge_img(char *nom_fichier, int ***rouge, int ***vert, int ***bleu, int *largeur, int *hauteur){
 	//Déclaration image
 	DonneesImageRGB *image=NULL;
 	
 	//Déclaration recadrage
-	int* eps=NULL;	
-
-	//Déclaration matrices
-   	int** rouge=NULL; 
-	int** vert=NULL; 
-	int** bleu=NULL;
-
-	//Déclarations nouvelles dimensions
-	int* largeur=NULL;
-	int* hauteur=NULL;
+	int* eps=NULL;
 	int* tab = new int[3];
 	
 	cout << "========== Lecture de l'image =========" << endl << endl;
-    	
-	image = lisBMPRGB("img/champ2.bmp");
 	
-	cout << "Largeur : " << image->largeurImage << endl << "Hauteur : " << image->hauteurImage << endl << endl;	
+	image = lisBMPRGB(nom_fichier);
 	
-	int x = tab[0] = image->largeurImage;
-	int y = tab[1] = image->hauteurImage;
+	cout << "Largeur : " << image->largeurImage << endl << "Hauteur : " << image->hauteurImage << endl << endl;
+	
 	tab[2] = 0;
 	largeur = tab;
 	hauteur = tab+1;
 	eps = tab+2;
 	
 	//Allocation matrices
-	rouge = new int*[image->largeurImage];
+	*rouge = new int*[image->largeurImage];
 	for (int i=0; i<image->largeurImage; i++)
-		rouge[i] = new int[image->hauteurImage];
-
-	vert = new int*[image->largeurImage];
+		*rouge[i] = new int[image->hauteurImage];
+	
+	*vert = new int*[image->largeurImage];
 	for (int i=0; i<image->largeurImage; i++)
-		vert[i] = new int[image->hauteurImage];
+		*vert[i] = new int[image->hauteurImage];
 	
-	bleu = new int*[image->largeurImage];
+	*bleu = new int*[image->largeurImage];
 	for (int i=0; i<image->largeurImage; i++)
-		bleu[i] = new int[image->hauteurImage];
+		*bleu[i] = new int[image->hauteurImage];
 	
-	cree3matrices(image, rouge, vert, bleu);
+	cree3matrices(image, *rouge, *vert, *bleu);
 	
-	rouge = multiple8(image, rouge, largeur, hauteur, eps);
-	vert = multiple8(image, vert, largeur, hauteur, eps);
-	bleu = multiple8(image, bleu, largeur, hauteur, eps);
-	
-	unsigned char* tabRVB=NULL;
-	tabRVB = (unsigned char*)calloc(1, sizeof(unsigned char)*(*largeur)*(*hauteur)*3);
-
-	creeImage(tabRVB, rouge, vert, bleu, x, y);
-	
-	cout << "========== Ecriture de l'image =========" << endl;
-	
-	ecrisImageRVB("out", tabRVB, largeur, hauteur, eps);
+	*rouge = multiple8(image, *rouge, largeur, hauteur, eps);
+	*vert  = multiple8(image, *vert,  largeur, hauteur, eps);
+	*bleu  = multiple8(image, *bleu,  largeur, hauteur, eps);
 }
+
+//int x = tab[0] = image->largeurImage;
+//int y = tab[1] = image->hauteurImage;
+//pour écrire :
+//	unsigned char* tabRVB=NULL;
+//	tabRVB = (unsigned char*)calloc(1, sizeof(unsigned char)*(*largeur)*(*hauteur)*3);
+//
+//	creeImage(tabRVB, rouge, vert, bleu, x, y);
+//	
+//	cout << "========== Ecriture de l'image =========" << endl;
+//	
+//	ecrisImageRVB("out", tabRVB, largeur, hauteur, eps);
+//}

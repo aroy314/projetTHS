@@ -10,6 +10,7 @@
 #include <fstream>
 #include <math.h>
 #include "image.hpp"
+#include "chrg_img.hpp"
 
 using namespace std;
 
@@ -20,7 +21,6 @@ class Image {
 	// ------------------- ATTRIBUTS --------------------
     int largeur;            //largeur (i)
     int hauteur;			//hauteur (j)
-    int **image = NULL;     //image de base
     int **R = NULL;         //two dimensions matrix
     int **G = NULL;
     int **B = NULL;
@@ -65,10 +65,6 @@ class Image {
                 Obj[k][l] = (int) (Obj[k][l]*this->Q[k][l]);    // multiplie notre matrice 8x8 par l'objet Q, membre à membre
         std::cout << "quantification inverse faite\n";
     }
-	
-	void charge_img(const char * nom_image[],int *taille){
-		
-	}
 	
 	void dct_2D(int **Matrice8x8){
 		
@@ -501,20 +497,15 @@ class Image {
 
     public :
 
-    Image(const char * nom_image[]){ //CONSTRUCTEUR
+    Image(const char * nom_image){ //CONSTRUCTEUR
 		
 		//chargement de l'image et attribution de la taille de la matrice NN
-		//charge_img(nom_image,&this->taille);
+		charge_img(nom_image,&this->R,&this->G,&this->B,&this->largeur,&this->hauteur);
 		
         //allocation des attributs
-        this->image = new int *[3*this->largeur];
         this->R     = new int *[this->largeur];
         this->G     = new int *[this->largeur];
         this->B     = new int *[this->largeur];
-		
-		for (int i=0;i<3*this->largeur;i++) {
-			this->image[i] = new int[this->hauteur];
-		}
 		
         for (int i=0;i<this->largeur;i++) {
             this->R[i]     = new int[this->hauteur];
@@ -534,14 +525,6 @@ class Image {
 		this->VecteursG		= new int[2*this->largeur*this->hauteur];
 		this->VecteursB		= new int[2*this->largeur*this->hauteur];
 		this->Vecteur		= new int[6*this->largeur*this->hauteur+3]; //contiens les vect RGB + nb de val dans chacun à chaque debut de vect
-		
-		//attribution des matrices RGB selon la matrice image
-		for(int i=0;i<this->largeur;i=i+3)
-			for(int j=0;j<this->hauteur;i++){
-				this->R[i][j] = this->image[i][j];
-				this->G[i][j] = this->image[i+1][j];
-				this->B[i][j] = this->image[i+2][j];
-			}
 		
         //calcul de Q
         int q;
@@ -568,11 +551,6 @@ class Image {
 			delete this->B[i];
 		}
 		
-		for (int i=0;i<this->largeur*3;i++) {
-			delete this->image[i];
-		}
-		
-		delete this->image;
 		delete this->R;
 		delete this->G;
 		delete this->B;
