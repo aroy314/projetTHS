@@ -11,6 +11,9 @@
 #include <math.h>
 #include "image.hpp"
 #include "chrg_img.hpp"
+#include "OutilsLib.h"
+#include "BmpLib.h"
+#include "BmpLibfri.h"
 
 using namespace std;
 
@@ -497,7 +500,7 @@ class Image {
 
     public :
 
-    Image(const char * nom_image){ //CONSTRUCTEUR
+    Image(char * nom_image){ //CONSTRUCTEUR
 		
 		//chargement de l'image et attribution de la taille de la matrice NN
 		charge_img(nom_image,&this->R,&this->G,&this->B,&this->largeur,&this->hauteur);
