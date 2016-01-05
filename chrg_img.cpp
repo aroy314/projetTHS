@@ -74,9 +74,9 @@ int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* haute
 	return matrice8;
 }
 
-void charge_img(char *nom_fichier, int ***rouge, int ***vert, int ***bleu, int *largeur, int *hauteur){
+void charge_img(DonneesImageRGB *image, int ***rouge, int ***vert, int ***bleu, int *largeur, int *hauteur){
 	//Déclaration image
-	DonneesImageRGB *image=NULL;
+	//DonneesImageRGB *image = NULL;
 	
 	//Déclaration recadrage
 	int* eps=NULL;
@@ -84,7 +84,7 @@ void charge_img(char *nom_fichier, int ***rouge, int ***vert, int ***bleu, int *
 	
 	cout << "========== Lecture de l'image =========" << endl << endl;
 	
-	image = lisBMPRGB(nom_fichier);
+	//image = lisBMPRGB(nom_fichier);
 	
 	cout << "Largeur : " << image->largeurImage << endl << "Hauteur : " << image->hauteurImage << endl << endl;
 	
