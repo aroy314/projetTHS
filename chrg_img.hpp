@@ -20,6 +20,6 @@ void creeImage(tabRVB tabRVB, int** rouge, int** vert, int** bleu, int x, int y)
 
 //Mise en carré multiple de 8
 int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* hauteur, int* eps);
-void charge_img(DonneesImageRGB *image, int ***rouge, int ***vert, int ***bleu, int *largeur, int *hauteur);
+void charge_img(char *nom_fichier, int ***rouge, int ***vert, int ***bleu, int *largeur, int *hauteur);
 
 #endif /* chrg_img_h */

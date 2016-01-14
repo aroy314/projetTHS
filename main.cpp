@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <math.h>
-#include "image.cpp"
+#include "image.hpp"
 #include "chrg_img.hpp"
 #include "OutilsLib.h"
 #include "BmpLib.h"
@@ -19,12 +19,20 @@ using namespace std;
 int main(int argc, const char * argv[]) {
     
    //allocation de l'objet image
-        //le constructeur charge l'img et alloue les 3 matrices
-	char *nom_image = (char*) argv[1];
-	DonneesImageRGB *imagemesboules = NULL;
-	imagemesboules = lisBMPRGB(nom_image);
 	
-    Image *image = new Image(imagemesboules);
+	char *nom_image = NULL;
+	if(strlen(argv[1]) == 0){
+		cout << "entrez un nom d'image : ";
+		cin >> nom_image;
+	}else{
+		nom_image = (char*) argv[1];
+	}
+	
+	//test
+	static DonneesImageRGB *poney = NULL;
+	poney = lisBMPRGB(nom_image);
+	
+    Image *image = new Image(nom_image);
 	
     image->compression();
 	
