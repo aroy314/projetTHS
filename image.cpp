@@ -10,7 +10,6 @@
 #include <fstream>
 #include <math.h>
 #include "image.hpp"
-#include "chrg_img.hpp"
 
 using namespace std;
 	// ------------------- FONCTIONS ----------------------

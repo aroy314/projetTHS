@@ -9,7 +9,6 @@
 #ifndef image_hpp
 #define image_hpp
 
-#include <stdio.h>
 //
 //  image.cpp
 //  projetTHS
@@ -21,8 +20,11 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include "image.hpp"
+#include <stdio.h>
 #include "chrg_img.hpp"
+#include "OutilsLib.h"
+#include "BmpLib.h"
+#include "BmpLibfri.h"
 
 using namespace std;
 

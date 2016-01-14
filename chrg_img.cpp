@@ -2,9 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "chrg_img.hpp"
-#include "OutilsLib.h"
-#include "BmpLib.h"
-#include "BmpLibfri.h"
 
 using namespace std;
 
@@ -77,7 +74,7 @@ int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* haute
 
 void charge_img(char *nom_fichier, int ***rouge, int ***vert, int ***bleu, int *largeur, int *hauteur){
 	//Déclaration image
-	static DonneesImageRGB *image = NULL;
+	DonneesImageRGB *image = NULL;
 	
 	//Déclaration recadrage
 	int* eps=NULL;
@@ -113,16 +110,3 @@ void charge_img(char *nom_fichier, int ***rouge, int ***vert, int ***bleu, int *
 	*vert  = multiple8(image, *vert,  largeur, hauteur, eps);
 	*bleu  = multiple8(image, *bleu,  largeur, hauteur, eps);
 }
-
-//int x = tab[0] = image->largeurImage;
-//int y = tab[1] = image->hauteurImage;
-//pour écrire :
-//	unsigned char* tabRVB=NULL;
-//	tabRVB = (unsigned char*)calloc(1, sizeof(unsigned char)*(*largeur)*(*hauteur)*3);
-//
-//	creeImage(tabRVB, rouge, vert, bleu, x, y);
-//	
-//	cout << "========== Ecriture de l'image =========" << endl;
-//	
-//	ecrisImageRVB("out", tabRVB, largeur, hauteur, eps);
-//}
