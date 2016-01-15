@@ -5,6 +5,8 @@
 #include "BmpLib.h"
 #include "BmpLibfri.h"
 
+#define FNAME "fichier.txt"
+
 using namespace std;
 
 void cree3matrices(DonneesImageRGB *image, int** rouge, int** vert, int** bleu)
@@ -124,6 +126,56 @@ int main(void)
 	vert = multiple8(image, vert, largeur, hauteur, eps);
 	bleu = multiple8(image, bleu, largeur, hauteur, eps);
 	
+	//Matrice --> Fichier
+	FILE *fichier1 = fopen (FNAME, "w" );
+         if (fichier1 == NULL)
+         {
+            perror (FNAME);
+         }
+         else
+         {
+            int i;
+            for (i = 0; i < image->largeurImage; i++)
+            {
+               int j;
+               for (j = 0; j < image->hauteurImage; j++)
+               {
+                  fprintf (fichier1, "%d,", rouge[i][j]);
+		  fprintf (fichier1, "%d,", vert[i][j]);
+		  fprintf (fichier1, "%d,", bleu[i][j]);
+
+               }
+               fprintf (fichier1, "\n" );
+            }
+         fclose(fichier1);
+	 }
+	
+	//Fichier --> Matrice
+	FILE *fichier2 = fopen (FNAME, "r" );
+         if (fichier2 == NULL)
+         {
+            perror (FNAME);
+         }
+         else
+         {
+	 int i;
+ 	 for(i = 0; i < image->largeurImage; i++)
+  	 {
+      		int j;
+	 	for(j = 0; j < image->hauteurImage; j++) 
+      		{
+       
+	 if (!fscanf(fichier2, "%d,%d,%d,", &rouge[i][j],&vert[i][j],&bleu[i][j])) 
+        
+	     	break;
+       
+	 printf("%d,%d,%d\n", rouge[i][j],vert[i][j],bleu[i][j]);
+      		}
+
+  	 }
+	 fclose(fichier2);	 
+	 }
+
 	unsigned char* tabRVB=NULL;
 	tabRVB = (unsigned char*)calloc(1, sizeof(unsigned char)*(*largeur)*(*hauteur)*3);
 
