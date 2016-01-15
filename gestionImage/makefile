@@ -21,4 +21,4 @@ clean:
 	rm -f *~ *.o
 
 deepclean: clean
-	rm -f $(EXEC) out
+	rm -f $(EXEC) out fichier.txt

@@ -40,17 +40,16 @@ void creeImage(tabRVB tabRVB, int** rouge, int** vert, int** bleu, int x, int y)
 }
 
 //Mise en carré multiple de 8
-int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* hauteur, int* eps){	
+int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* hauteur){	
 	int i = (*largeur) % 8, j = (*hauteur) % 8;
 		if (i != 0){
 			*largeur += 8 - i;
-			*eps = 8 - i;
-		cout << "Cas 1 :" << endl;
+		cout << "Redimension largeur :" << endl;
 		cout << "Largeur : " << *largeur << endl << "Hauteur : " << *hauteur << endl << endl;
 	}
 		if (j != 0){
 			*hauteur += 8 - j;
-		cout << "Cas 2 :" << endl;
+		cout << "Redimension hauteur :" << endl;
 		cout << "Largeur : " << *largeur << endl << "Hauteur : " << *hauteur << endl << endl;
 	}
 
@@ -76,13 +75,16 @@ int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* haute
 	return matrice8;
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+	if(argv[1]==0)
+	{
+		printf("Entrer le nom de l'image à traiter\n");
+		return 0;
+	}
+
 	//Déclaration image
 	DonneesImageRGB *image=NULL;
-	
-	//Déclaration recadrage
-	int* eps=NULL;	
 
 	//Déclaration matrices
    	int** rouge=NULL; 
@@ -94,9 +96,13 @@ int main(void)
 	int* hauteur=NULL;
 	int* tab = new int[3];
 	
-	cout << "========== Lecture de l'image =========" << endl << endl;
+	cout << "Lecture de l'image : ";
     	
-	image = lisBMPRGB("img/champ.bmp");
+	image = lisBMPRGB(argv[1]);
+	
+	cout << "Image Lue" << endl << endl;
+
+	cout << "Dimensions initiales :" << endl;
 	
 	cout << "Largeur : " << image->largeurImage << endl << "Hauteur : " << image->hauteurImage << endl << endl;	
 	
@@ -105,8 +111,7 @@ int main(void)
 	tab[2] = 0;
 	largeur = tab;
 	hauteur = tab+1;
-	eps = tab+2;
-	
+
 	//Allocation matrices
 	rouge = new int*[image->largeurImage];
 	for (int i=0; i<image->largeurImage; i++)
@@ -122,9 +127,9 @@ int main(void)
 	
 	cree3matrices(image, rouge, vert, bleu);
 	
-	rouge = multiple8(image, rouge, largeur, hauteur, eps);
-	vert = multiple8(image, vert, largeur, hauteur, eps);
-	bleu = multiple8(image, bleu, largeur, hauteur, eps);
+	rouge = multiple8(image, rouge, largeur, hauteur);
+	vert = multiple8(image, vert, largeur, hauteur);
+	bleu = multiple8(image, bleu, largeur, hauteur);
 	
 	//Matrice --> Fichier
 	FILE *fichier1 = fopen (FNAME, "w" );
@@ -135,10 +140,10 @@ int main(void)
          else
          {
             int i;
-            for (i = 0; i < image->largeurImage; i++)
+            for (i = 0; i < *largeur; i++)
             {
                int j;
-               for (j = 0; j < image->hauteurImage; j++)
+               for (j = 0; j < *hauteur; j++)
                {
                   fprintf (fichier1, "%d,", rouge[i][j]);
 		  fprintf (fichier1, "%d,", vert[i][j]);
@@ -159,17 +164,14 @@ int main(void)
          else
          {
 	 int i;
- 	 for(i = 0; i < image->largeurImage; i++)
+ 	 for(i = 0; i < *largeur; i++)
   	 {
       		int j;
-	 	for(j = 0; j < image->hauteurImage; j++) 
+	 	for(j = 0; j < *hauteur; j++) 
       		{
-       
 	 if (!fscanf(fichier2, "%d,%d,%d,", &rouge[i][j],&vert[i][j],&bleu[i][j])) 
         
 	     	break;
-       
-	 printf("%d,%d,%d\n", rouge[i][j],vert[i][j],bleu[i][j]);
       		}
 
   	 }
@@ -181,7 +183,9 @@ int main(void)
 
 	creeImage(tabRVB, rouge, vert, bleu, x, y);
 	
-	cout << "========== Ecriture de l'image =========" << endl;
+	cout << "Ecriture de l'image : ";
 	
-	ecrisImageRVB("out", tabRVB, largeur, hauteur, eps);
+	ecrisImageRVB("out", tabRVB, &image->largeurImage, &image->hauteurImage);
+	
+	cout << "Image Ecrite" << endl;
 }

@@ -175,7 +175,7 @@ DonneesImageRGB *lisBMPRGB(char *nom)
 
 /* Fonction ecrivant les informations de l'image dans le fichier passe en parametre.
 	Renvoie faux en cas de probleme, vrai sinon */
-bool ecrisBMPRGB_Dans(DonneesImageRGB *donneesImage, char *nom, int* eps)
+bool ecrisBMPRGB_Dans(DonneesImageRGB *donneesImage, char *nom)
 {
 	FILE *fichierBMP;
 	bool toutOK = false;
@@ -238,8 +238,8 @@ bool ecrisBMPRGB_Dans(DonneesImageRGB *donneesImage, char *nom, int* eps)
 						(indexLigne = 0; (indexLigne < donneesImage->hauteurImage) && toutOK; ++indexLigne)
 					{
 						/* On recopie ligne a ligne les informations */
-						memcpy(scanline, pointeurDonnees, (unsigned int)((donneesImage->largeurImage)-*eps)*3);
-						pointeurDonnees += ((donneesImage->largeurImage)-*eps)*3;
+						memcpy(scanline, pointeurDonnees, (unsigned int)((donneesImage->largeurImage))*3);
+						pointeurDonnees += ((donneesImage->largeurImage))*3;
 						
 						if
 							(fwrite(scanline, (unsigned int)tailleScanLine, 1, fichierBMP) != 1)
@@ -278,7 +278,7 @@ tabRVB lisImageRVB(chaine nom)
                  return data;
 }
 
-void ecrisImageRVB(chaine nom, tabRVB monImageData, int* largeur, int* hauteur, int* eps)
+void ecrisImageRVB(chaine nom, tabRVB monImageData, int* largeur, int* hauteur)
 {
  DonneesImageRGB *monImage;
 	monImage = (DonneesImageRGB*)calloc(1, sizeof(DonneesImageRGB));
@@ -286,5 +286,5 @@ void ecrisImageRVB(chaine nom, tabRVB monImageData, int* largeur, int* hauteur, 
 	monImage->hauteurImage = little32VersNatif(*hauteur);
 	monImage->donneesRGB = monImageData;
      
-     ecrisBMPRGB_Dans(monImage,nom, eps);
+     ecrisBMPRGB_Dans(monImage,nom);
 }
