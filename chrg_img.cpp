@@ -1,9 +1,7 @@
 #include "iostream"
 #include <stdio.h>
 #include <stdlib.h>
-#include "OutilsLib.h"
-#include "BmpLib.h"
-#include "BmpLibfri.h"
+#include "chrg_img.hpp"
 
 using namespace std;
 
@@ -74,9 +72,9 @@ int** multiple8(DonneesImageRGB *image, int**  matrice, int* largeur, int* haute
 	return matrice8;
 }
 
-void charge_img(DonneesImageRGB *image, int ***rouge, int ***vert, int ***bleu, int *largeur, int *hauteur){
+void charge_img(char *nom_fichier, int ***rouge, int ***vert, int ***bleu, int *largeur, int *hauteur){
 	//Déclaration image
-	//DonneesImageRGB *image = NULL;
+	DonneesImageRGB *image = NULL;
 	
 	//Déclaration recadrage
 	int* eps=NULL;
@@ -84,7 +82,7 @@ void charge_img(DonneesImageRGB *image, int ***rouge, int ***vert, int ***bleu, 
 	
 	cout << "========== Lecture de l'image =========" << endl << endl;
 	
-	//image = lisBMPRGB(nom_fichier);
+	image = lisBMPRGB(nom_fichier);
 	
 	cout << "Largeur : " << image->largeurImage << endl << "Hauteur : " << image->hauteurImage << endl << endl;
 	
@@ -112,16 +110,3 @@ void charge_img(DonneesImageRGB *image, int ***rouge, int ***vert, int ***bleu, 
 	*vert  = multiple8(image, *vert,  largeur, hauteur, eps);
 	*bleu  = multiple8(image, *bleu,  largeur, hauteur, eps);
 }
-
-//int x = tab[0] = image->largeurImage;
-//int y = tab[1] = image->hauteurImage;
-//pour écrire :
-//	unsigned char* tabRVB=NULL;
-//	tabRVB = (unsigned char*)calloc(1, sizeof(unsigned char)*(*largeur)*(*hauteur)*3);
-//
-//	creeImage(tabRVB, rouge, vert, bleu, x, y);
-//	
-//	cout << "========== Ecriture de l'image =========" << endl;
-//	
-//	ecrisImageRVB("out", tabRVB, largeur, hauteur, eps);
-//}

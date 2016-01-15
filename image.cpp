@@ -10,33 +10,11 @@
 #include <fstream>
 #include <math.h>
 #include "image.hpp"
-#include "chrg_img.hpp"
 
 using namespace std;
-
-class Image {
-	
-	// ------------------- PRIVATE ----------------------
-	private :
-	// ------------------- ATTRIBUTS --------------------
-    int largeur;            //largeur (i)
-    int hauteur;			//hauteur (j)
-    int **R = NULL;         //two dimensions matrix
-    int **G = NULL;
-    int **B = NULL;
-	
-    int *VecteursR = NULL;  //Vector R G and B compressed
-	int *VecteursG = NULL;
-	int *VecteursB = NULL;
-	int *Vecteur	= NULL; // FINAL VECTOR TO WRITE ON DISK
-	int *Vecteur128 = NULL; // Vector compressed from Matrix8x8
-	
-    int **Matrice8x8 = NULL;//8x8 matrix we work with
-    int **Q = NULL;         //quantification matrix
-
 	// ------------------- FONCTIONS ----------------------
     
-    void initQ(int q){			// Création de la matrice de quantification
+	void Image::initQ(int q){			// Création de la matrice de quantification
         int k,l;
         for(k=0;k<8;k++){        // parcourt lignes
             for (l=0;l<8;l++){   // parcourt colonnes
@@ -47,7 +25,7 @@ class Image {
     }
     
     // Application de la phase de quantification sur chacune des matrices
-	void quantification(int ** Obj) {		// on récupère notre matrice 8x8
+	void Image::quantification(int ** Obj) {		// on récupère notre matrice 8x8
 		int k,l;
 		for(k=0;k<8;k++)					// parcourt lignes
 			for (l=0;l<8;l++)				// parcourt colonnes
@@ -58,7 +36,7 @@ class Image {
 	}
 	
         // Application de la phase de quantification inverse sur chacune des matrices
-    void quantification_inv(int ** Obj) {	// on récupère notre matrice 8x8
+    void Image::quantification_inv(int ** Obj) {	// on récupère notre matrice 8x8
         int k,l;
         for(k=0;k<8;k++)					// parcourt lignes
             for (l=0;l<8;l++)				// parcourt colonnes
@@ -66,7 +44,7 @@ class Image {
         std::cout << "quantification inverse faite\n";
     }
 	
-	void dct_2D(int **Matrice8x8){
+	void Image::dct_2D(int **Matrice8x8){
 		
 		//allocation d'une matrice de travail
 		float **Matrice_dct = new float*[8];
@@ -94,7 +72,7 @@ class Image {
 				Matrice8x8[i][j]=Matrice_dct[i][j];//reatribution de la matrice de travail
 	}
 	
-    void dct_2D_Inverse(int **Matrice8x8){
+    void Image::dct_2D_Inverse(int **Matrice8x8){
         float **Matrice_dct = new float*[8];
         for (int i = 0; i < 8; i++)
             Matrice_dct[i] = new float[8];
@@ -123,7 +101,7 @@ class Image {
 
 	
 	//fonction de recup d'une matrice NxN et allocation de la 8x8 selon des paramètres x,y (haut gauche de la matrice)
-	void compression8x8(int x, int y, int **matriceNN, int *Vecteur, int *nbV){
+	void Image::compression8x8(int x, int y, int **matriceNN, int *Vecteur, int *nbV){
 		//recup de la 8x8
 		for(int i=0;i<8;i++)
 			for(int j=0;j<8;j++)
@@ -151,7 +129,7 @@ class Image {
 		delete Vect_out;
 	}
 	
-	void decompression8x8(int x, int y, int **matriceNN, int* Vecteur, int *nbElem){
+	void Image::decompression8x8(int x, int y, int **matriceNN, int* Vecteur, int *nbElem){
 		int *Vect_temp = new int[64];
 		int nbIn = 0;
 		//on recupère this->vecteur128 compressé issu de vecteurRGB
@@ -174,7 +152,7 @@ class Image {
 				matriceNN[x+i][y+j] = this->Matrice8x8[i][j];
 	}
 	
-	void concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on met V2 au bout de V1
+	void Image::concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on met V2 au bout de V1
 		
 		int test=0;
 		int i=0;
@@ -197,7 +175,7 @@ class Image {
 		
 	}
 	
-	void deconcatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on attribue un vecteur issu de V1 à V2, et on slide le V1 vers la gauche du nb de valeurs récupérées
+	void Image::deconcatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on attribue un vecteur issu de V1 à V2, et on slide le V1 vers la gauche du nb de valeurs récupérées
 		
 		int i=1, cpt=0;//compteur de case et compteur cumulé
 		
@@ -216,7 +194,7 @@ class Image {
 
 	}
 
-	void suppression_zeros(int *V1, int **V2, int *nb_elem){
+	void Image::suppression_zeros(int *V1, int **V2, int *nb_elem){
 		int i=0;
 		int cpt=0;
 		int size=0;
@@ -239,7 +217,7 @@ class Image {
 		}
 	}
 	
-    void fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
+    void Image::fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
 		
         int i=1;//notre compteur
         int j=0;
@@ -284,7 +262,7 @@ class Image {
     }
 
 	
-	void unfuuusion(int *V, int *R, int *nbR, int *G, int *nbG, int *B, int *nbB){	//Separation de V en R/G/B
+	void Image::unfuuusion(int *V, int *R, int *nbR, int *G, int *nbG, int *B, int *nbB){	//Separation de V en R/G/B
 		
 		int i=1, cpt=0;//compteur de case et compteur cumulé
 		//sauvegarde de pointeur
@@ -333,7 +311,7 @@ class Image {
 		cout << "unfuuusion fait" << endl;
 	}
 
-	void zigzag(int **Matrice8x8, int *Vect){
+	void Image::zigzag(int **Matrice8x8, int *Vect){
 		//lecture de la 88 image
 		//ecriture de Vecteur avec la lecture en zigzag
 		
@@ -367,7 +345,7 @@ class Image {
 		cout << endl << "ZigZag fait" << endl;
 	}
 
-	void compression_zigzag (int *V1, int *V2, int *nb_elem){//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
+	void Image::compression_zigzag (int *V1, int *V2, int *nb_elem){//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
 		int a = 1, cpt=0;
 		
 		for (int pos=0; pos<64 ; pos++){ // parcours le tableau
@@ -387,7 +365,7 @@ class Image {
 		cout << "compression de Vecteur faite" << endl << "Nb d'elements : " << *nb_elem << endl;
 	}
 	
-    void decompression_zigzag (int *V1, int *V2, const int nb_elem)//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
+    void Image::decompression_zigzag (int *V1, int *V2, const int nb_elem)//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
     {
         int p = 0;
         
@@ -398,14 +376,14 @@ class Image {
     }
 
 	
-	void EcritureFinal_jpg(int *Vecteur){
+	void Image::EcritureFinal_jpg(int *Vecteur){
 		//Ecriture fichier en jpg
 		
 		std::cout << "Ecriture faite\n";
 		
 	}
 	
-	void zigzag_inverse (int ** Obj,int * linea) {
+	void Image::zigzag_inverse (int ** Obj,int * linea) {
 		
 		int pos=0;
 		int k=0,l=0;	// k indices lignes, l indice colonnes
@@ -445,7 +423,7 @@ class Image {
 	}
 	
 	
-	void writeVect(int *Vect){
+	void Image::writeVect(int *Vect){
 		
 		ofstream fichier; //alloc d'un fichier
 		fichier.open("CompressedVector.txt");//ouverture du fichier
@@ -489,20 +467,18 @@ class Image {
 		fichier.close();//fermeture du fichier
 	}
 	
-	void readVect(int *Vect){
+	void Image::readVect(int *Vect){
 		
 	}
 	
 	// ------------------- PUBLIC ----------------------
 
-    public :
-
-    Image(DonneesImageRGB *image){ //CONSTRUCTEUR
+    Image::Image(char *nom_fichier){ //CONSTRUCTEUR
 		
 		//chargement de l'image et attribution de la taille de la matrice NN
 		//DonneesImageRGB *image = NULL;
 		
-		charge_img(image,&this->R,&this->G,&this->B,&this->largeur,&this->hauteur);
+		charge_img(nom_fichier,&this->R,&this->G,&this->B,&this->largeur,&this->hauteur);
 		
         //allocation des attributs
         this->R     = new int *[this->largeur];
@@ -544,7 +520,7 @@ class Image {
 
     }
     
-    ~Image(){ //DESTRUCTEUR
+    Image::~Image(){ //DESTRUCTEUR
 		//destruction des attributs
 		
 		for (int i=0;i<this->largeur;i++) {
@@ -574,12 +550,11 @@ class Image {
 		cout << "destruction faite\n";
 		}
 	
-    void compression(){
+    void Image::compression(){
 		
 		if(this->largeur%8!=0 || this->hauteur%8!=0)//test tout bête
 			cout << "Erreur dans la taille des matrices : pas multiple de 8" << endl;
 		else {
-		
 			//entier indiquant le nb de val de chaque vecteur
 			int nbR=0, nbG=0, nbB=0;
 		
@@ -599,10 +574,9 @@ class Image {
 			
 			cout << "compression faite, fichier ecrit "<< endl;
 		}
-
     }
 	
-	void decompression(){	//compression à l'envers
+	void Image::decompression(){	//compression à l'envers
 		//readVect(this->Vecteur);
 		cout << " chargé en mémoire" << endl;
 		
@@ -621,6 +595,4 @@ class Image {
 		
 		cout << "decompression faite" << endl;
 	}
-
-};
 
