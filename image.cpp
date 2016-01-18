@@ -9,7 +9,11 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "image.hpp"
+
+#define FNAME "/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/gestionImage/fichier.txt"
 
 using namespace std;
 	// ------------------- FONCTIONS ----------------------
@@ -426,7 +430,7 @@ using namespace std;
 	void Image::writeVect(int *Vect){
 		
 		ofstream fichier; //alloc d'un fichier
-		fichier.open("CompressedVector.txt");//ouverture du fichier
+		fichier.open("/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/CompressedVector.txt");//ouverture du fichier
 		
 		int i=1;//notre compteur
 		int cpt=0;//compteur cumulé
@@ -473,23 +477,42 @@ using namespace std;
 	
 	// ------------------- PUBLIC ----------------------
 
-    Image::Image(char *nom_fichier){ //CONSTRUCTEUR
+    Image::Image(){ //CONSTRUCTEUR
 		
 		//chargement de l'image et attribution de la taille de la matrice NN
 		//DonneesImageRGB *image = NULL;
 		
-		charge_img(nom_fichier,&this->R,&this->G,&this->B,&this->largeur,&this->hauteur);
+		//Fichier --> Matrice
+		FILE *fichier2 = fopen (FNAME, "r" );
+		if (fichier2 == NULL){
+			perror (FNAME);
+			printf("impossible de lire gestionImage/fichier.txt\n");
+			exit(1);
+		}
+		else {
+			int i=0;
+			int j=0;
+			fscanf(fichier2, "%d,%d,\n", &this->largeur, &this->hauteur);
+
+			//allocation des attributs
+			this->R     = new int *[this->largeur];
+			this->G     = new int *[this->largeur];
+			this->B     = new int *[this->largeur];
+			for (int i=0;i<this->largeur;i++) {
+				this->R[i]     = new int[this->hauteur];
+				this->G[i]     = new int[this->hauteur];
+				this->B[i]     = new int[this->hauteur];
+			}
+
+			for(i = 0; i < this->largeur; i++){
+				for(j = 1; j < this->hauteur; j++){
+					if (!fscanf(fichier2, "%d,%d,%d,", &this->R[i][j],&this->G[i][j],&this->B[i][j]))
+						break;
+				}
+			}
+			fclose(fichier2);
+	 }
 		
-        //allocation des attributs
-        this->R     = new int *[this->largeur];
-        this->G     = new int *[this->largeur];
-        this->B     = new int *[this->largeur];
-		
-        for (int i=0;i<this->largeur;i++) {
-            this->R[i]     = new int[this->hauteur];
-            this->G[i]     = new int[this->hauteur];
-            this->B[i]     = new int[this->hauteur];
-        }
 		
         this->Matrice8x8 = new int *[8];
         this->Q = new int *[8];
@@ -502,7 +525,7 @@ using namespace std;
 		this->VecteursR		= new int[2*this->largeur*this->hauteur];
 		this->VecteursG		= new int[2*this->largeur*this->hauteur];
 		this->VecteursB		= new int[2*this->largeur*this->hauteur];
-		this->Vecteur		= new int[6*this->largeur*this->hauteur+3]; //contiens les vect RGB + nb de val dans chacun à chaque debut de vect
+		this->Vecteur		= new int[6*this->largeur*this->hauteur+3]; //contient les vect RGB + nb de val dans chacun à chaque debut de vect
 		
         //calcul de Q
         int q;

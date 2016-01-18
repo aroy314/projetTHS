@@ -9,24 +9,12 @@
 #include <iostream>
 #include <math.h>
 #include "image.hpp"
-#include "chrg_img.hpp"
-#include "OutilsLib.h"
-#include "BmpLib.h"
-#include "BmpLibfri.h"
 
 using namespace std;
 
 int main(int argc, const char * argv[]) {
-    
-	char *nom_image = NULL;
-	if(strlen(argv[1]) == 0){
-		cout << "entrez un nom d'image : ";
-		cin >> nom_image;
-	}else{
-		nom_image = (char*) argv[1];
-	}
 	
-    Image *image = new Image(nom_image);
+    Image *image = new Image();
 	
     image->compression();
 	

@@ -21,10 +21,7 @@
 #include <fstream>
 #include <math.h>
 #include <stdio.h>
-#include "chrg_img.hpp"
-#include "OutilsLib.h"
-#include "BmpLib.h"
-#include "BmpLibfri.h"
+#include <stdlib.h>
 
 using namespace std;
 
@@ -95,7 +92,7 @@ class Image {
 	
 	public :
 	
-	Image(char *nom_fichier);
+	Image();
 	
 	~Image();
 	

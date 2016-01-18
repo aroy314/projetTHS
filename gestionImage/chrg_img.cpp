@@ -139,11 +139,14 @@ int main(int argc, char *argv[])
          }
          else
          {
-            int i;
+            int i=0;
+            int j=0;
+            //ecriture entete
+            fprintf (fichier1, "%d,", *largeur);
+            fprintf (fichier1, "%d,\n", *hauteur);
             for (i = 0; i < *largeur; i++)
             {
-               int j;
-               for (j = 0; j < *hauteur; j++)
+               for (j = 1; j < *hauteur; j++)
                {
                   fprintf (fichier1, "%d,", rouge[i][j]);
 		  fprintf (fichier1, "%d,", vert[i][j]);
@@ -163,11 +166,12 @@ int main(int argc, char *argv[])
          }
          else
          {
-	 int i;
- 	 for(i = 0; i < *largeur; i++)
-  	 {
-      		int j;
-	 	for(j = 0; j < *hauteur; j++) 
+	 int i=0;
+	 int j=0;
+	 fscanf(fichier2, "%d,%d,\n", largeur,hauteur);
+	 cout << "l,h : " << *largeur << " " << *hauteur << endl;
+ 	 for(i = 0; i < *largeur; i++){
+	 	for(j = 1; j < *hauteur; j++) 
       		{
 	 if (!fscanf(fichier2, "%d,%d,%d,", &rouge[i][j],&vert[i][j],&bleu[i][j])) 
         
@@ -185,7 +189,7 @@ int main(int argc, char *argv[])
 	
 	cout << "Ecriture de l'image : ";
 	
-	ecrisImageRVB("out", tabRVB, &image->largeurImage, &image->hauteurImage);
+	ecrisImageRVB("out.bmp", tabRVB, &image->largeurImage, &image->hauteurImage);
 	
 	cout << "Image Ecrite" << endl;
 }
