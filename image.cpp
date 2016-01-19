@@ -439,30 +439,30 @@ using namespace std;
 		int nbelem = Vect[0];
 		fichier << Vect[0] << " ";
 		while(cpt<nbelem){
-			cout << i << " " << cpt << " " << Vect[i] << endl;
+			//cout << i << " " << cpt << " " << Vect[i] << endl;
 			fichier << Vect[i] << " " << Vect[i+1] << " ";//on ecrit deux cases
 			cpt+=Vect[i];
 			i+=2;//on tape 2 cases plus loin au prochain tour
 			
 		}
-		cout << i << " " << cpt << " " << Vect[i] << endl;
+		//cout << i << " " << cpt << " " << Vect[i] << endl;
 		//GREEN
 		nbelem = Vect[i];
 		fichier << Vect[i] << " ";
 		i++;cpt=0;//réinit du compteur cumulé
 		while(cpt<nbelem){
-			cout << i << " " << cpt << " " << Vect[i] << endl;
+			//cout << i << " " << cpt << " " << Vect[i] << endl;
 			fichier << Vect[i] << " " << Vect[i+1] << " ";
 			cpt+=Vect[i];
 			i+=2;
 		}
-		cout << i << " " << cpt << " " << Vect[i] << endl;
+		//cout << i << " " << cpt << " " << Vect[i] << endl;
 		//BLUE
 		nbelem = Vect[i];
 		fichier << Vect[i] << " ";
 		i++;cpt=0;//réinit du compteur cumulé
 		while(cpt<nbelem){
-			cout << i << " " << cpt << " " << Vect[i] << endl;
+			//cout << i << " " << cpt << " " << Vect[i] << endl;
 			fichier << Vect[i] << " " << Vect[i+1] << " ";
 			cpt+=Vect[i];
 			i+=2;
