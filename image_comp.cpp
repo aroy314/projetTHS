@@ -11,14 +11,14 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "image.hpp"
+#include "image_comp.hpp"
 
 #define FNAME "/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/gestionImage/fichier.txt"
 
 using namespace std;
 	// ------------------- FONCTIONS ----------------------
     
-	void Image::initQ(int q){			// Création de la matrice de quantification
+	void Image_comp::initQ(int q){			// Création de la matrice de quantification
         int k,l;
         for(k=0;k<8;k++){        // parcourt lignes
             for (l=0;l<8;l++){   // parcourt colonnes
@@ -29,7 +29,7 @@ using namespace std;
     }
     
     // Application de la phase de quantification sur chacune des matrices
-	void Image::quantification(int ** Obj) {		// on récupère notre matrice 8x8
+	void Image_comp::quantification(int ** Obj) {		// on récupère notre matrice 8x8
 		int k,l;
 		for(k=0;k<8;k++)					// parcourt lignes
 			for (l=0;l<8;l++)				// parcourt colonnes
@@ -38,17 +38,7 @@ using namespace std;
 		cout << endl << "quantification faite\n";
 		
 	}
-	
-        // Application de la phase de quantification inverse sur chacune des matrices
-    void Image::quantification_inv(int ** Obj) {	// on récupère notre matrice 8x8
-        int k,l;
-        for(k=0;k<8;k++)					// parcourt lignes
-            for (l=0;l<8;l++)				// parcourt colonnes
-                Obj[k][l] = (int) (Obj[k][l]*this->Q[k][l]);    // multiplie notre matrice 8x8 par l'objet Q, membre à membre
-        std::cout << "quantification inverse faite\n";
-    }
-	
-	void Image::dct_2D(int **Matrice8x8){
+	void Image_comp::dct_2D(int **Matrice8x8){
 		
 		//allocation d'une matrice de travail
 		float **Matrice_dct = new float*[8];
@@ -75,37 +65,9 @@ using namespace std;
 			for (int j=0; j<8; j++)
 				Matrice8x8[i][j]=Matrice_dct[i][j];//reatribution de la matrice de travail
 	}
-	
-    void Image::dct_2D_Inverse(int **Matrice8x8){
-        float **Matrice_dct = new float*[8];
-        for (int i = 0; i < 8; i++)
-            Matrice_dct[i] = new float[8];
-		
-        float Cx;
-        float Cy;
-		
-        for (int i=0; i<8; i++)
-            for (int j=0; j<8; j++){
-				Matrice_dct[i][j] = 0;
-                for (int x=0; x<8; x++)
-                  for (int y=0; y<8; y++){
-                        (x==0) ? Cx=1/sqrt(2): Cx=1;
-                        (y==0) ? Cy=1/sqrt(2): Cy=1;
-                        Matrice_dct[i][j]+=(1/sqrt(16))*(Matrice8x8[x][y]*Cx*Cy*cos(((2*i+1)*x*M_PI)/16)*cos(((2*j+1)*y*M_PI)/16));
-                    }
-            }
-		
-        for (int i=0; i<8; i++)
-            for (int j=0; j<8; j++)
-                Matrice8x8[i][j] = Matrice_dct[i][j];
-		
-		cout << "DCT2D inverse faite\n";
 
-    }
-
-	
 	//fonction de recup d'une matrice NxN et allocation de la 8x8 selon des paramètres x,y (haut gauche de la matrice)
-	void Image::compression8x8(int x, int y, int **matriceNN, int *Vecteur, int *nbV){
+	void Image_comp::compression8x8(int x, int y, int **matriceNN, int *Vecteur, int *nbV){
 		//recup de la 8x8
 		for(int i=0;i<8;i++)
 			for(int j=0;j<8;j++)
@@ -132,31 +94,8 @@ using namespace std;
 		concatVect(Vecteur, nbV, Vect_out, &nbOut);
 		delete Vect_out;
 	}
-	
-	void Image::decompression8x8(int x, int y, int **matriceNN, int* Vecteur, int *nbElem){
-		int *Vect_temp = new int[64];
-		int nbIn = 0;
-		//on recupère this->vecteur128 compressé issu de vecteurRGB
-		deconcatVect(Vecteur, nbElem, this->Vecteur128, &nbIn);
-		
-		//on decompresse this->Vecteur128
-		decompression_zigzag(this->Vecteur128, Vect_temp, nbIn);
-		
-		//on le met dans une matrice avec zigzag et on complete de 0
-		zigzag_inverse(this->Matrice8x8, Vect_temp);
-		delete Vect_temp;
-		
-		//on effectue la quantif inverse + la dct inverse
-		dct_2D_Inverse(this->Matrice8x8);
-		quantification_inv(this->Matrice8x8);
-		
-		//on écrit la 8x8 au bon endroit dans la NxN
-		for(int i=0;i<8;i++)
-			for(int j=0;j<8;j++)
-				matriceNN[x+i][y+j] = this->Matrice8x8[i][j];
-	}
-	
-	void Image::concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on met V2 au bout de V1
+
+	void Image_comp::concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on met V2 au bout de V1
 		
 		int test=0;
 		int i=0;
@@ -176,29 +115,9 @@ using namespace std;
 			V1[i+k]=V2[k];
 		
 		*nb_val1=*nb_val1+*nb_val2;
-		
-	}
-	
-	void Image::deconcatVect(int *V1, int *nb_val1, int *V2, int *nb_val2){ //on attribue un vecteur issu de V1 à V2, et on slide le V1 vers la gauche du nb de valeurs récupérées
-		
-		int i=1, cpt=0;//compteur de case et compteur cumulé
-		
-		//check du bon nombre de valeurs à prendre
-		*nb_val2 = V1[0];
-		
-		while(cpt < *nb_val2){
-			V2[i] = V1[i];
-			V2[i+1] = V1[i+1];
-			cpt += V1[i];
-			i += 2;
-		}
-		
-		//on décale V1 vers la gauche de i cases en arithmétique de pointeur
-		V1 = V1+i;
-
 	}
 
-	void Image::suppression_zeros(int *V1, int **V2, int *nb_elem){
+	void Image_comp::suppression_zeros(int *V1, int **V2, int *nb_elem){
 		int i=0;
 		int cpt=0;
 		int size=0;
@@ -221,7 +140,7 @@ using namespace std;
 		}
 	}
 	
-    void Image::fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
+    void Image_comp::fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
 		
         int i=1;//notre compteur
         int j=0;
@@ -265,57 +184,7 @@ using namespace std;
         cout << "Vecteur Final : " << "nb de cases : " << i << endl << "nb de valeurs : " << cptVect << endl;
     }
 
-	
-	void Image::unfuuusion(int *V, int *R, int *nbR, int *G, int *nbG, int *B, int *nbB){	//Separation de V en R/G/B
-		
-		int i=1, cpt=0;//compteur de case et compteur cumulé
-		//sauvegarde de pointeur
-		int *SVG = V;
-
-		//check du bon nombre de valeurs à prendre
-		*nbR = V[0];
-		//recup de R
-		while(cpt < *nbR){
-			R[i]	= V[i];
-			R[i+1]	= V[i+1];
-			cpt += V[i];
-			i += 2;
-		}
-		//reinit de cpt
-		cpt = 0;
-		//decalage de V puis réinit de i
-		V = V+i;
-		i = 1;
-		//check du bon nombre de valeurs à prendre
-		*nbG = V[0];
-		//recup de G
-		while(cpt < *nbG){
-			G[i]	= V[i];
-			G[i+1]	= V[i+1];
-			cpt	+= V[i];
-			i	+= 2;
-		}
-		//reinit de cpt
-		cpt = 0;
-		//decalage de V puis réinit de i
-		V = V+i;
-		i = 1;
-		//check du bon nombre de valeurs à prendre
-		*nbB = V[0];
-		//recup de G
-		while(cpt < *nbB){
-			B[i]	= V[i];
-			B[i+1]	= V[i+1];
-			cpt += V[i];
-			i += 2;
-		}
-		//recup du bon pointeur sur V
-		V = SVG;
-		
-		cout << "unfuuusion fait" << endl;
-	}
-
-	void Image::zigzag(int **Matrice8x8, int *Vect){
+	void Image_comp::zigzag(int **Matrice8x8, int *Vect){
 		//lecture de la 88 image
 		//ecriture de Vecteur avec la lecture en zigzag
 		
@@ -349,7 +218,7 @@ using namespace std;
 		cout << endl << "ZigZag fait" << endl;
 	}
 
-	void Image::compression_zigzag (int *V1, int *V2, int *nb_elem){//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
+	void Image_comp::compression_zigzag (int *V1, int *V2, int *nb_elem){//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
 		int a = 1, cpt=0;
 		
 		for (int pos=0; pos<64 ; pos++){ // parcours le tableau
@@ -369,7 +238,7 @@ using namespace std;
 		cout << "compression de Vecteur faite" << endl << "Nb d'elements : " << *nb_elem << endl;
 	}
 	
-    void Image::decompression_zigzag (int *V1, int *V2, const int nb_elem)//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
+    void Image_comp::decompression_zigzag (int *V1, int *V2, const int nb_elem)//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
     {
         int p = 0;
         
@@ -379,55 +248,7 @@ using namespace std;
                     V1[p++]=V2[i+1];
     }
 
-	
-	void Image::EcritureFinal_jpg(int *Vecteur){
-		//Ecriture fichier en jpg
-		
-		std::cout << "Ecriture faite\n";
-		
-	}
-	
-	void Image::zigzag_inverse (int ** Obj,int * linea) {
-		
-		int pos=0;
-		int k=0,l=0;	// k indices lignes, l indice colonnes
-		
-		for (int i=0 ; i<8 ;i++)
-			for ( int j=0 ; j<8 ; j++)
-				Obj[i][j] = 0;		// on rempli notre tableau de 0
-		
-		while ((k!=7)||(l!=7))			// tant qu'on n'est pas arrivé au dernier élément de la matrice
-		{
-			while((k!=0)&&(l!=7))		// tant qu'on n'est pas à la fin de la première ligne de la matrice
-			{
-				Obj[k][l]=linea[pos++];		// on récupère dans la matrice l'élément correspondant de la linéarisation
-				k--;				// on décrémente les lignes
-				l++;				// on incrémente les colonnes
-			}				// --> diago croissante
-			Obj[k][l]=linea[pos++];		// on récupère à nouveau l'élément de linéarisation dans la matrice
-			if(l==7)
-				k++;
-			else
-				l++;
-			while((k!=7)&&(l!=0))		// tant qu'on n'est pas au début de la dernière ligne de la matrice
-			{
-				Obj[k][l]=linea[pos++];		// on récupère dans la matrice l'élément correspondant de la linéarisation
-				k++;				// on décrémente les lignes
-				l--;				// on incrémente les colonnes
-			}				// --> diago décroissante
-			Obj[k][l]=linea[pos++];		// on récupère à nouveau l'élément de linéarisation dans la matrice
-			if(k==7)
-				l++;
-			else
-				k++;
-		}
-		
-		Obj[k][l]=linea[pos];
-		cout << "ZigZag Inverse fait\n";
-	}
-	
-	
-	void Image::writeVect(int *Vect){
+	void Image_comp::writeVect(int *Vect){
 		
 		ofstream fichier; //alloc d'un fichier
 		fichier.open("/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/CompressedVector.txt");//ouverture du fichier
@@ -471,17 +292,9 @@ using namespace std;
 		fichier.close();//fermeture du fichier
 	}
 	
-	void Image::readVect(int *Vect){
-		ofstream fichier; //alloc d'un fichier
-		fichier.open("/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/CompressedVector.txt");//ouverture du fichier
-	}
-	
 	// ------------------- PUBLIC ----------------------
 
-    Image::Image(){ //CONSTRUCTEUR
-		
-		//chargement de l'image et attribution de la taille de la matrice NN
-		//DonneesImageRGB *image = NULL;
+    Image_comp::Image_comp(){ //CONSTRUCTEUR
 		
 		//Fichier --> Matrice
 		FILE *fichier2 = fopen (FNAME, "r" );
@@ -512,8 +325,7 @@ using namespace std;
 				}
 			}
 			fclose(fichier2);
-	 }
-		
+	    }
 		
         this->Matrice8x8 = new int *[8];
         this->Q = new int *[8];
@@ -544,7 +356,7 @@ using namespace std;
 
     }
     
-    Image::~Image(){ //DESTRUCTEUR
+    Image_comp::~Image_comp(){ //DESTRUCTEUR
 		//destruction des attributs
 		
 		for (int i=0;i<this->largeur;i++) {
@@ -574,7 +386,7 @@ using namespace std;
 		cout << "destruction faite\n";
 		}
 	
-    void Image::compression(){
+    void Image_comp::compression(){
 		
 		if(this->largeur%8!=0 || this->hauteur%8!=0)//test tout bête
 			cout << "Erreur dans la taille des matrices : pas multiple de 8" << endl;
@@ -589,7 +401,7 @@ using namespace std;
 					compression8x8(i*8,j*8,this->G,this->VecteursG,&nbG);
 					compression8x8(i*8,j*8,this->B,this->VecteursB,&nbB);
 				}
-			//PROBLEME A CORRIGER ICI AVEC nbRGB et architecture des Vecteurs RGB
+
 			//mise bout à bout des 3 vecteurs RGB dans Vecteur, séparé par une case indiquant le nb de valeurs dans chacun
 			fuuusion(this->VecteursR,nbR,this->VecteursG,nbG,this->VecteursB,nbB,this->Vecteur);
 		
@@ -599,24 +411,4 @@ using namespace std;
 			cout << "compression faite, fichier ecrit "<< endl;
 		}
     }
-	
-	void Image::decompression(){	//compression à l'envers
-		//readVect(this->Vecteur);
-		cout << " chargé en mémoire" << endl;
-		
-		//Separation de this->vecteur en vecteurs R/G/B
-		//entier indiquant le nb de val de chaque vecteur
-		int nbR=0, nbG=0, nbB=0;
-		unfuuusion(this->Vecteur,this->VecteursR,&nbR,this->VecteursG,&nbG,this->VecteursB,&nbB);
-		
-		//repartition de chaque vecteursRGB dans des vecteurs 88 puis mise en matrice et traitement
-		for(int i=0;i<this->largeur/8;i++)
-			for(int j=0;j<this->hauteur/8;j++){
-				decompression8x8(i*8,j*8,this->R,this->VecteursR,&nbR);
-				decompression8x8(i*8,j*8,this->G,this->VecteursG,&nbG);
-				decompression8x8(i*8,j*8,this->B,this->VecteursB,&nbB);
-			}
-		
-		cout << "decompression faite" << endl;
-	}
 

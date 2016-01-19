@@ -6,8 +6,8 @@
 //  Copyright © 2015 Alexandre ROY. All rights reserved.
 //
 
-#ifndef image_hpp
-#define image_hpp
+#ifndef image_comp_hpp
+#define image_comp_hpp
 
 #include <iostream>
 #include <fstream>
@@ -17,7 +17,7 @@
 
 using namespace std;
 
-class Image {
+class Image_comp {
 	
 	// ------------------- PRIVATE ----------------------
 	private :
@@ -44,54 +44,33 @@ class Image {
 	// Application de la phase de quantification sur chacune des matrices
 	void quantification(int ** Obj);
 	
-	// Application de la phase de quantification inverse sur chacune des matrices
-	void quantification_inv(int ** Obj);
-	
 	void dct_2D(int **Matrice8x8);
-	
-	void dct_2D_Inverse(int **Matrice8x8);
 	
 	//fonction de recup d'une matrice NxN et allocation de la 8x8 selon des paramètres x,y (haut gauche de la matrice)
 	void compression8x8(int x, int y, int **matriceNN, int *Vecteur, int *nbV);
 	
-	void decompression8x8(int x, int y, int **matriceNN, int* Vecteur, int *nbElem);
-	
 	void concatVect(int *V1, int *nb_val1, int *V2, int *nb_val2);
-	
-	void deconcatVect(int *V1, int *nb_val1, int *V2, int *nb_val2);
 	
 	void suppression_zeros(int *V1, int **V2, int *nb_elem);
 	
 	void fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V);
 	
-	void unfuuusion(int *V, int *R, int *nbR, int *G, int *nbG, int *B, int *nbB);
-	
 	void zigzag(int **Matrice8x8, int *Vect);
 	
 	void compression_zigzag (int *V1, int *V2, int *nb_elem);
 	
-	void decompression_zigzag (int *V1, int *V2, const int nb_elem);
-	
-	void EcritureFinal_jpg(int *Vecteur);
-	
-	void zigzag_inverse (int ** Obj,int * linea);
-	
 	void writeVect(int *Vect);
-	
-	void readVect(int *Vect);
 	
 	// ------------------- PUBLIC ----------------------
 	
 	public :
 	
-	Image();
+	Image_comp();
 	
-	~Image();
+	~Image_comp();
 	
 	void compression();
-	
-	void decompression();
 };
 
 
-#endif /* image_hpp */
+#endif

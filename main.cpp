@@ -8,20 +8,24 @@
 
 #include <iostream>
 #include <math.h>
-#include "image.hpp"
+#include "image_comp.hpp"
+#include "image_decomp.hpp"
 
 using namespace std;
 
 int main(int argc, const char * argv[]) {
 	
-    Image *image = new Image();
+    Image_comp *image_comp = new Image_comp();
+    image_comp->compression();
 	
-    //image->compression();
-	image->decompression();
+	Image_decomp *image_decomp = new Image_decomp();
+	image_decomp->decompression();
 	
     cout << "fin du traitement\n" ;
 	
-	delete image;
+	delete image_comp;
+	delete image_decomp;
+
 
 	return 0;
 }
