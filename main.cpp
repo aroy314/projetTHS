@@ -16,7 +16,8 @@ int main(int argc, const char * argv[]) {
 	
     Image *image = new Image();
 	
-    image->compression();
+    //image->compression();
+	image->decompression();
 	
     cout << "fin du traitement\n" ;
 	

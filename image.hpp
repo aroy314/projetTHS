@@ -9,14 +9,6 @@
 #ifndef image_hpp
 #define image_hpp
 
-//
-//  image.cpp
-//  projetTHS
-//
-//  Created by Alexandre ROY on 16/11/2015.
-//  Copyright © 2015 Alexandre ROY. All rights reserved.
-//
-
 #include <iostream>
 #include <fstream>
 #include <math.h>

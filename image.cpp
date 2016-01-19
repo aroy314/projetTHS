@@ -472,7 +472,8 @@ using namespace std;
 	}
 	
 	void Image::readVect(int *Vect){
-		
+		ofstream fichier; //alloc d'un fichier
+		fichier.open("/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/CompressedVector.txt");//ouverture du fichier
 	}
 	
 	// ------------------- PUBLIC ----------------------
