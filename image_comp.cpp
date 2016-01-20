@@ -37,7 +37,7 @@ using namespace std;
 			for (l=0;l<8;l++)				// parcourt colonnes
 				Obj[k][l] = (int) (Obj[k][l]/this->Q[k][l]);    // divise notre matrice 8x8 par l'objet Q, membre à membre
 		
-		cout << endl << "quantification faite\n";
+		//cout << "quantification faite";
 		
 		/* Version 2
 		 int k,l;
@@ -234,7 +234,7 @@ using namespace std;
 				k++;
 		}
 		Vect[i]=Matrice8x8[k][l];
-		cout << endl << "ZigZag fait" << endl;
+		//cout << endl << "ZigZag fait" << endl;
 	}
 
 	void Image_comp::compression_zigzag (int *V1, int *V2, int *nb_elem){//V1 vecteur non compressé, V2 vecteur compressé, nombre d'elem dans le vecteur
@@ -254,7 +254,7 @@ using namespace std;
 		for (int i=0;i<cpt;i+=2)
 			*nb_elem += V2[i];
 		
-		cout << "compression de Vecteur faite" << endl << "Nb d'elements : " << *nb_elem << endl;
+		//cout << "compression de Vecteur faite" << endl << "Nb d'elements : " << *nb_elem << endl;
 	}
 	
 	void Image_comp::writeVect(int *Vect){

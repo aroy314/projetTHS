@@ -36,7 +36,7 @@ using namespace std;
         for(k=0;k<8;k++)					// parcourt lignes
             for (l=0;l<8;l++)				// parcourt colonnes
                 Obj[k][l] = (int) (Obj[k][l]*this->Q[k][l]);    // multiplie notre matrice 8x8 par l'objet Q, membre à membre
-        std::cout << "quantification inverse faite\n";
+        //cout << "quantification inverse faite\n";
     }
 
     void Image_decomp::dct_2D_Inverse(int **Matrice8x8){
@@ -62,7 +62,7 @@ using namespace std;
             for (int j=0; j<8; j++)
                 Matrice8x8[i][j] = Matrice_dct[i][j];
 		
-		cout << "DCT2D inverse faite\n";
+		//cout << "DCT2D inverse faite\n";
 
     }
 
@@ -101,7 +101,7 @@ using namespace std;
 				k++;
 		}
 		Obj[k][l]=linea[pos];
-		cout << "ZigZag Inverse fait\n";
+		//cout << "ZigZag Inverse fait\n";
 	}
 
 	void Image_decomp::decompression_zigzag (int *V1, int *V2, const int nb_elem)//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
@@ -153,7 +153,7 @@ using namespace std;
 		V1 = V1+i;
 	}
 	
-	void Image_decomp::unfuuusion(int *V, int *R, int *nbR, int *G, int *nbG, int *B, int *nbB){	//Separation de V en R/G/B
+	void Image_decomp::unfuuusion(int *V, int **R, int *nbR, int **G, int *nbG, int **B, int *nbB){	//Separation de V en R/G/B
 		
 		int i=0, j=1, cpt=0;//compteur de case V, de cases RGB et compteur cumulé
 
@@ -161,11 +161,13 @@ using namespace std;
 		*nbR = V[0];
 		//recup de R
 		while(cpt < *nbR){
-			R[i]	= V[j];
-			R[i+1]	= V[j+1];
+			copy(V+j, V+j+2, *R+i);
+//			(*R[i])	= V[j];
+//			(*R[i+1]) = V[j+1];
 			//test
-			if(R[i]	!= V[j] || R[i+1] != V[j+1])
-				cout << "Erreur egalité : " << i << "," << j << endl;
+//			if(*R[i] != V[j] || *R[i+1] != V[j+1]){
+//				cout << "Erreur egalité : " << i << "," << j << " " << *R[i] << "!=" << V[j] << " et " << *R[i+1] << "!=" << V[j+1] << endl;
+//			}
 			//fintest
 			cpt += V[j];
 			i += 2;
@@ -180,11 +182,10 @@ using namespace std;
 		j++;
 		//recup de G
 		while(cpt < *nbG){
-			G[i]	= V[j];
-			G[i+1]	= V[j+1];
+			copy(V+j, V+j+2, *G+i);
 			//test
-			if(G[i]	!= V[j] || G[i+1] != V[j+1])
-				cout << "Erreur egalité : " << i << "," << j << endl;
+//			if(*G[i]	!= V[j] || *G[i+1] != V[j+1])
+//				cout << "Erreur egalité : " << i << "," << j << endl;
 			//fintest
 			cpt	+= V[j];
 			i += 2;
@@ -199,11 +200,10 @@ using namespace std;
 		j++;
 		//recup de G
 		while(cpt < *nbB){
-			B[i]	= V[j];
-			B[i+1]	= V[j+1];
+			copy(V+j, V+j+2, *B+i);
 			//test
-			if(B[i]	!= V[j] || B[i+1] != V[j+1])
-				cout << "Erreur egalité : " << i << "," << j << endl;
+//			if(*B[i]	!= V[j] || *B[i+1] != V[j+1])
+//				cout << "Erreur egalité : " << i << "," << j << endl;
 			//fintest
 			cpt += V[j];
 			i += 2;
@@ -230,7 +230,8 @@ void Image_decomp::readVect(int** Vect, int* largeur, int* hauteur, int* q){
 		for(i = 0; i < 6*(*largeur)*(*hauteur)+3; i++){
 			if (!fscanf(vector, "%d ", *Vect+i))
 				break;
-			cout << *(*Vect+i) << " ";
+			if(i%2==0 && *(*Vect+i)!=0)
+				cout << *(*Vect+i) << " " << *(*Vect+i+1) << " ";
 		}
 		cout << endl;
 	}
@@ -309,7 +310,7 @@ void Image_decomp::readVect(int** Vect, int* largeur, int* hauteur, int* q){
 		//Separation de this->vecteur en vecteurs R/G/B
 		//entier indiquant le nb de val de chaque vecteur
 		int nbR=0, nbG=0, nbB=0;
-		unfuuusion(this->Vecteur,this->VecteursR,&nbR,this->VecteursG,&nbG,this->VecteursB,&nbB);
+		unfuuusion(this->Vecteur,&this->VecteursR,&nbR,&this->VecteursG,&nbG,&this->VecteursB,&nbB);
 		
 		//test affichage de Vect R G et B
 		cout << endl << "nb cases R G B : " <<  nbR << " " << nbG << " " << nbB << endl;

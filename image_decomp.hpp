@@ -52,7 +52,7 @@ class Image_decomp {
 	
 	void deconcatVect(int *V1, int *nb_val1, int *V2, int *nb_val2);
 	
-	void unfuuusion(int *V, int *R, int *nbR, int *G, int *nbG, int *B, int *nbB);
+	void unfuuusion(int *V, int **R, int *nbR, int **G, int *nbG, int **B, int *nbB);
 	
 	void decompression_zigzag (int *V1, int *V2, const int nb_elem);
 	
