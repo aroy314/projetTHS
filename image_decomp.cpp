@@ -1,5 +1,5 @@
 //
-//  image.cpp
+//  image_decomp.cpp
 //  projetTHS
 //
 //  Created by Alexandre ROY on 16/11/2015.
@@ -13,7 +13,9 @@
 #include <stdlib.h>
 #include "image_decomp.hpp"
 
-#define FNAME "/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/gestionImage/fichier.txt"
+#define FMATRIX "/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/gestionImage/fichier.txt"
+#define FMATRIX2 "/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/gestionImage/fichier2.txt"
+#define FVECTOR "/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/CompressedVector.txt"
 
 using namespace std;
 	// ------------------- FONCTIONS ----------------------
@@ -64,6 +66,54 @@ using namespace std;
 
     }
 
+	void Image_decomp::zigzag_inverse (int ** Obj,int * linea) {
+		
+		int pos=0;
+		int k=0,l=0;	// k indices lignes, l indice colonnes
+		
+		for (int i=0 ; i<8 ;i++)
+			for ( int j=0 ; j<8 ; j++)
+				Obj[i][j] = 0;		// on rempli notre tableau de 0
+		
+		while ((k!=7)||(l!=7))			// tant qu'on n'est pas arrivé au dernier élément de la matrice
+		{
+			while((k!=0)&&(l!=7))		// tant qu'on n'est pas à la fin de la première ligne de la matrice
+			{
+				Obj[k][l]=linea[pos++];		// on récupère dans la matrice l'élément correspondant de la linéarisation
+				k--;				// on décrémente les lignes
+				l++;				// on incrémente les colonnes
+			}				// --> diago croissante
+			Obj[k][l]=linea[pos++];		// on récupère à nouveau l'élément de linéarisation dans la matrice
+			if(l==7)
+				k++;
+			else
+				l++;
+			while((k!=7)&&(l!=0))		// tant qu'on n'est pas au début de la dernière ligne de la matrice
+			{
+				Obj[k][l]=linea[pos++];		// on récupère dans la matrice l'élément correspondant de la linéarisation
+				k++;				// on décrémente les lignes
+				l--;				// on incrémente les colonnes
+			}				// --> diago décroissante
+			Obj[k][l]=linea[pos++];		// on récupère à nouveau l'élément de linéarisation dans la matrice
+			if(k==7)
+				l++;
+			else
+				k++;
+		}
+		Obj[k][l]=linea[pos];
+		cout << "ZigZag Inverse fait\n";
+	}
+
+	void Image_decomp::decompression_zigzag (int *V1, int *V2, const int nb_elem)//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
+	{
+		int p = 0;
+		
+		for (int i=0; i<nb_elem ; i++) //Reatribue les valeurs de base de la matrice 64
+			if (i%2==0)
+				for (int j=0; j<V2[i]; j++)
+					V1[p++]=V2[i+1];
+	}
+
 	void Image_decomp::decompression8x8(int x, int y, int **matriceNN, int* Vecteur, int *nbElem){
 		int *Vect_temp = new int[64];
 		int nbIn = 0;
@@ -113,8 +163,8 @@ using namespace std;
 		*nbR = V[0];
 		//recup de R
 		while(cpt < *nbR){
-			R[i]	= V[i];
-			R[i+1]	= V[i+1];
+			R[i-1]	= V[i];
+			R[i]	= V[i+1];
 			cpt += V[i];
 			i += 2;
 		}
@@ -127,8 +177,8 @@ using namespace std;
 		*nbG = V[0];
 		//recup de G
 		while(cpt < *nbG){
-			G[i]	= V[i];
-			G[i+1]	= V[i+1];
+			G[i-1]	= V[i];
+			G[i]	= V[i+1];
 			cpt	+= V[i];
 			i	+= 2;
 		}
@@ -141,8 +191,8 @@ using namespace std;
 		*nbB = V[0];
 		//recup de G
 		while(cpt < *nbB){
-			B[i]	= V[i];
-			B[i+1]	= V[i+1];
+			B[i-1]	= V[i];
+			B[i]	= V[i+1];
 			cpt += V[i];
 			i += 2;
 		}
@@ -152,22 +202,64 @@ using namespace std;
 		cout << "unfuuusion fait" << endl;
 	}
 
+void Image_decomp::readVect(int** Vect, int* largeur, int* hauteur, int* q){
+	
+	//Vector --> Matrice
+	FILE *vector = fopen (FVECTOR, "r" );
+	if (vector == NULL){
+		perror (FVECTOR);
+	}
+	else
+	{
+		int i=0;
+		fscanf(vector, "%d %d %d\n", largeur, hauteur, q);
+		*Vect = new int[6*(*largeur)*(*hauteur)+3];
+		cout << "l,h,q : " << *largeur << " " << *hauteur << " " << *q << endl;
+		cout << 6*(*largeur)*(*hauteur) << endl;
+		for(i = 0; i < 6*(*largeur)*(*hauteur)+3; i++){
+			if (!fscanf(vector, "%d ", *Vect+i))
+				break;
+			cout << *(*Vect+i) << " ";
+		}
+		cout << endl;
+	}
+	fclose(vector);
+}
+
 	// ------------------- PUBLIC ----------------------
 
     Image_decomp::Image_decomp(){ //CONSTRUCTEUR
-	    //faire le constructeur ici
-        
+		cout << "construction de Image_decomp...\n";
+		//lecture du fichier, alloc de Vecteur, largeur, hauteur et q
+		readVect(&this->Vecteur,&this->largeur,&this->hauteur,&this->q);
+		
+		//alloc des paramètres
+		this->R     = new int *[this->largeur];
+		this->G     = new int *[this->largeur];
+		this->B     = new int *[this->largeur];
+		for (int i=0;i<this->largeur;i++) {
+			this->R[i]     = new int[this->hauteur];
+			this->G[i]     = new int[this->hauteur];
+			this->B[i]     = new int[this->hauteur];
+		}
 
-        //calcul de Q
-        int q;
-        
+		this->Matrice8x8 = new int *[8];
+		this->Q = new int *[8];
+		for (int i=0;i<8;i++) {
+			this->Matrice8x8[i] = new int[8];
+			this->Q[i] = new int[8];
+		}
+		
+		this->Vecteur128	= new int[128];
+		this->VecteursR		= new int[2*this->largeur*this->hauteur];
+		this->VecteursG		= new int[2*this->largeur*this->hauteur];
+		this->VecteursB		= new int[2*this->largeur*this->hauteur];
+
         this->Q = new int*[8]; //init Matrice Q
         for (int i = 0; i < 8; i++)
             Q[i] = new int[8];
-        
-        cout << "Entrez le paramètre de compression : ";
-        cin >> q;
-        initQ(q);
+		
+        initQ(this->q);
         cout << "construction faite\n";
     }
     
@@ -201,9 +293,7 @@ using namespace std;
 		cout << "destruction faite\n";
 		}
 
-	void Image_decomp::decompression(){	//compression à l'envers
-		//readVect(this->Vecteur);
-		cout << " chargé en mémoire" << endl;
+	void Image_decomp::decompression(){	//compression à l'envers avec fonctions inverses
 		
 		//Separation de this->vecteur en vecteurs R/G/B
 		//entier indiquant le nb de val de chaque vecteur
@@ -218,6 +308,27 @@ using namespace std;
 				decompression8x8(i*8,j*8,this->B,this->VecteursB,&nbB);
 			}
 		
+		//ecriture de la matrice dans un fichier
+		//Matrice --> Fichier
+		FILE *fmatrix2 = fopen (FMATRIX2, "w" );
+		if (fmatrix2 == NULL){
+			perror (FMATRIX2);
+		}
+		else {
+			int i=0;
+			int j=0;
+			//ecriture entete
+			fprintf (fmatrix2, "%d,%d,\n", this->largeur,this->hauteur);
+			for (i = 0; i < this->largeur; i++)	{
+				for (j = 1; j < this->hauteur; j++)	{
+					fprintf (fmatrix2, "%d,", this->R[i][j]);
+					fprintf (fmatrix2, "%d,", this->G[i][j]);
+					fprintf (fmatrix2, "%d,", this->B[i][j]);
+				}
+				fprintf (fmatrix2, "\n" );
+			}
+			fclose(fmatrix2);
+		}
 		cout << "decompression faite" << endl;
 	}
 

@@ -1,5 +1,5 @@
 //
-//  image.hpp
+//  image_decomp.hpp
 //  projetTHS
 //
 //  Created by Alexandre ROY on 16/11/2015.
@@ -24,6 +24,7 @@ class Image_decomp {
 	// ------------------- ATTRIBUTS --------------------
 	int largeur;            //largeur (i)
 	int hauteur;			//hauteur (j)
+	int q;					//valeur de q
 	int **R = NULL;         //two dimensions matrix
 	int **G = NULL;
 	int **B = NULL;
@@ -59,7 +60,7 @@ class Image_decomp {
 	
 	void zigzag_inverse (int ** Obj,int * linea);
 	
-	void readVect(int *Vect);
+	void readVect(int **Vect, int *largeur, int *hauteur, int *q);
 	
 	// ------------------- PUBLIC ----------------------
 	

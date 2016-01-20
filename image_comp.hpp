@@ -1,5 +1,5 @@
 //
-//  image.hpp
+//  image_comp.hpp
 //  projetTHS
 //
 //  Created by Alexandre ROY on 16/11/2015.
@@ -24,6 +24,7 @@ class Image_comp {
 	// ------------------- ATTRIBUTS --------------------
 	int largeur;            //largeur (i)
 	int hauteur;			//hauteur (j)
+	int q;					//valeur de q
 	int **R = NULL;         //two dimensions matrix
 	int **G = NULL;
 	int **B = NULL;

@@ -1,5 +1,5 @@
 //
-//  image.cpp
+//  image_comp.cpp
 //  projetTHS
 //
 //  Created by Alexandre ROY on 16/11/2015.
@@ -13,7 +13,9 @@
 #include <stdlib.h>
 #include "image_comp.hpp"
 
-#define FNAME "/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/gestionImage/fichier.txt"
+#define FMATRIX "/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/gestionImage/fichier.txt"
+#define FVECTOR "/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/CompressedVector.txt"
+
 
 using namespace std;
 	// ------------------- FONCTIONS ----------------------
@@ -36,6 +38,23 @@ using namespace std;
 				Obj[k][l] = (int) (Obj[k][l]/this->Q[k][l]);    // divise notre matrice 8x8 par l'objet Q, membre à membre
 		
 		cout << endl << "quantification faite\n";
+		
+		/* Version 2
+		 int k,l;
+		 float A,B;
+		 for(k=0;k<8;k++)					// parcourt lignes
+			for (l=0;l<8;l++)
+			{
+		 A=(float)Obj[k][l]/(float)Q[k][l];
+		 B=(int)(Obj[k][l]/Q[k][l]);
+		 if (A-B<0.5) {
+		 Obj[k][l] = (int) (Obj[k][l]/this->Q[k][l]);    // divise notre matrice 8x8 par l'objet Q, membre à membre
+		 }// parcourt colonnes
+		 else{
+		 Obj[k][l] = (int) (Obj[k][l]/this->Q[k][l])+1;
+		 }
+		 cout << endl << "quantification faite\n";
+		 */
 		
 	}
 	void Image_comp::dct_2D(int **Matrice8x8){
@@ -238,20 +257,12 @@ using namespace std;
 		cout << "compression de Vecteur faite" << endl << "Nb d'elements : " << *nb_elem << endl;
 	}
 	
-    void Image_comp::decompression_zigzag (int *V1, int *V2, const int nb_elem)//V1 compressé, V2 décompressé de taille 64, nombre d'elem dans le vecteur
-    {
-        int p = 0;
-        
-        for (int i=0; i<nb_elem ; i++) //Reatribue les valeurs de base de la matrice 64
-            if (i%2==0)
-                for (int j=0; j<V2[i]; j++)
-                    V1[p++]=V2[i+1];
-    }
-
 	void Image_comp::writeVect(int *Vect){
 		
 		ofstream fichier; //alloc d'un fichier
-		fichier.open("/Volumes/Macintosh HD/Users/AlexandreROY/CloudStation/ISEN/M1/Projet THS/projetTHS/CompressedVector.txt");//ouverture du fichier
+		fichier.open(FVECTOR);//ouverture du fichier
+		//ecriture de largeur, hauteur, et valeur de q (paramètre de compression)
+		fichier << this->largeur << " " << this->hauteur << " " << this->q << endl;
 		
 		int i=1;//notre compteur
 		int cpt=0;//compteur cumulé
@@ -289,6 +300,10 @@ using namespace std;
 			i+=2;
 		}
 		
+		//on ecrit le nombre de cases au début du fichier
+		//fichier.seekp(0, ios::beg);
+		//fichier << i << " ";
+		
 		fichier.close();//fermeture du fichier
 	}
 	
@@ -296,10 +311,11 @@ using namespace std;
 
     Image_comp::Image_comp(){ //CONSTRUCTEUR
 		
+		cout << "construction de Image_comp...\n";
 		//Fichier --> Matrice
-		FILE *fichier2 = fopen (FNAME, "r" );
+		FILE *fichier2 = fopen (FMATRIX, "r" );
 		if (fichier2 == NULL){
-			perror (FNAME);
+			perror (FMATRIX);
 			printf("impossible de lire gestionImage/fichier.txt\n");
 			exit(1);
 		}
@@ -339,21 +355,15 @@ using namespace std;
 		this->VecteursG		= new int[2*this->largeur*this->hauteur];
 		this->VecteursB		= new int[2*this->largeur*this->hauteur];
 		this->Vecteur		= new int[6*this->largeur*this->hauteur+3]; //contient les vect RGB + nb de val dans chacun à chaque debut de vect
-		
-        //calcul de Q
-        int q;
         
         this->Q = new int*[8]; //init Matrice Q
         for (int i = 0; i < 8; i++)
             Q[i] = new int[8];
-        
-        
+		
         cout << "Entrez le paramètre de compression : ";
-        cin >> q;
-        initQ(q);
-        
+        cin >> this->q;
+        initQ(this->q);
         cout << "construction faite\n";
-
     }
     
     Image_comp::~Image_comp(){ //DESTRUCTEUR
@@ -384,7 +394,7 @@ using namespace std;
 		delete this->Vecteur128;
 
 		cout << "destruction faite\n";
-		}
+	}
 	
     void Image_comp::compression(){
 		
