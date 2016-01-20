@@ -155,49 +155,60 @@ using namespace std;
 	
 	void Image_decomp::unfuuusion(int *V, int *R, int *nbR, int *G, int *nbG, int *B, int *nbB){	//Separation de V en R/G/B
 		
-		int i=1, cpt=0;//compteur de case et compteur cumulé
-		//sauvegarde de pointeur
-		int *SVG = V;
+		int i=0, j=1, cpt=0;//compteur de case V, de cases RGB et compteur cumulé
 
 		//check du bon nombre de valeurs à prendre
 		*nbR = V[0];
 		//recup de R
 		while(cpt < *nbR){
-			R[i-1]	= V[i];
-			R[i]	= V[i+1];
-			cpt += V[i];
+			R[i]	= V[j];
+			R[i+1]	= V[j+1];
+			//test
+			if(R[i]	!= V[j] || R[i+1] != V[j+1])
+				cout << "Erreur egalité : " << i << "," << j << endl;
+			//fintest
+			cpt += V[j];
 			i += 2;
+			j += 2;
 		}
 		//reinit de cpt
 		cpt = 0;
-		//decalage de V puis réinit de i
-		V = V+i;
-		i = 1;
+		//réinit de i
+		i = 0;
 		//check du bon nombre de valeurs à prendre
-		*nbG = V[0];
+		*nbG = V[j];
+		j++;
 		//recup de G
 		while(cpt < *nbG){
-			G[i-1]	= V[i];
-			G[i]	= V[i+1];
-			cpt	+= V[i];
-			i	+= 2;
+			G[i]	= V[j];
+			G[i+1]	= V[j+1];
+			//test
+			if(G[i]	!= V[j] || G[i+1] != V[j+1])
+				cout << "Erreur egalité : " << i << "," << j << endl;
+			//fintest
+			cpt	+= V[j];
+			i += 2;
+			j += 2;
 		}
 		//reinit de cpt
 		cpt = 0;
-		//decalage de V puis réinit de i
-		V = V+i;
-		i = 1;
+		//réinit de i
+		i = 0;
 		//check du bon nombre de valeurs à prendre
-		*nbB = V[0];
+		*nbB = V[j];
+		j++;
 		//recup de G
 		while(cpt < *nbB){
-			B[i-1]	= V[i];
-			B[i]	= V[i+1];
-			cpt += V[i];
+			B[i]	= V[j];
+			B[i+1]	= V[j+1];
+			//test
+			if(B[i]	!= V[j] || B[i+1] != V[j+1])
+				cout << "Erreur egalité : " << i << "," << j << endl;
+			//fintest
+			cpt += V[j];
 			i += 2;
+			j += 2;
 		}
-		//recup du bon pointeur sur V
-		V = SVG;
 		
 		cout << "unfuuusion fait" << endl;
 	}
@@ -299,6 +310,35 @@ void Image_decomp::readVect(int** Vect, int* largeur, int* hauteur, int* q){
 		//entier indiquant le nb de val de chaque vecteur
 		int nbR=0, nbG=0, nbB=0;
 		unfuuusion(this->Vecteur,this->VecteursR,&nbR,this->VecteursG,&nbG,this->VecteursB,&nbB);
+		
+		//test affichage de Vect R G et B
+		cout << endl << "nb cases R G B : " <<  nbR << " " << nbG << " " << nbB << endl;
+		int cpt1=0;
+		int cpt2=0;
+		cout << endl << "Vecteur R : " << endl;
+		while(cpt2<nbR){
+			cout << this->VecteursR[cpt1] << " " << this->VecteursR[cpt1] << " ";
+			cpt2+=this->VecteursR[cpt1];
+			cpt1+=2;
+		}
+		cpt1=0;
+		cpt2=0;
+		cout << endl << "Vecteur G : " << endl;
+		while(cpt2<nbG){
+			cout << this->VecteursG[cpt1] << " " << this->VecteursG[cpt1] << " ";
+			cpt2+=this->VecteursG[cpt1];
+			cpt1+=2;
+		}
+		cpt1=0;
+		cpt2=0;
+		cout << endl << "Vecteur B : " << endl;
+		while(cpt2<nbB){
+			cout << this->VecteursB[cpt1] << " " << this->VecteursB[cpt1] << " ";
+			cpt2+=this->VecteursB[cpt1];
+			cpt1+=2;
+		}
+
+		//fin test affichage
 		
 		//repartition de chaque vecteursRGB dans des vecteurs 88 puis mise en matrice et traitement
 		for(int i=0;i<this->largeur/8;i++)
