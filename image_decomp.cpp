@@ -153,7 +153,7 @@ using namespace std;
 		V1 = V1+i;
 	}
 	
-	void Image_decomp::unfuuusion(int *V, int **R, int *nbR, int **G, int *nbG, int **B, int *nbB){	//Separation de V en R/G/B
+	void Image_decomp::unfuuusion(int *V, int *nbR, int *nbG, int *nbB){	//Separation de V en R/G/B
 		
 		int i=0, j=1, cpt=0;//compteur de case V, de cases RGB et compteur cumulé
 
@@ -161,13 +161,13 @@ using namespace std;
 		*nbR = V[0];
 		//recup de R
 		while(cpt < *nbR){
-			copy(V+j, V+j+2, *R+i);
-//			(*R[i])	= V[j];
-//			(*R[i+1]) = V[j+1];
+			//copy(V+j, V+j+2, this->VecteursR+i);
+			this->VecteursR[i]	= V[j];
+			this->VecteursR[i+1] = V[j+1];
 			//test
-//			if(*R[i] != V[j] || *R[i+1] != V[j+1]){
-//				cout << "Erreur egalité : " << i << "," << j << " " << *R[i] << "!=" << V[j] << " et " << *R[i+1] << "!=" << V[j+1] << endl;
-//			}
+			if(this->VecteursR[i] != V[j] || this->VecteursR[i+1] != V[j+1])
+				cout << "Erreur egalité : " << i << "," << j << " " << this->VecteursR[i] << "!=" << V[j] << " et " << this->VecteursR[i+1] << "!=" << V[j+1] << endl;
+			
 			//fintest
 			cpt += V[j];
 			i += 2;
@@ -182,10 +182,12 @@ using namespace std;
 		j++;
 		//recup de G
 		while(cpt < *nbG){
-			copy(V+j, V+j+2, *G+i);
+			//copy(V+j, V+j+2, this->VecteursG+i);
+			this->VecteursG[i]	= V[j];
+			this->VecteursG[i+1] = V[j+1];
 			//test
-//			if(*G[i]	!= V[j] || *G[i+1] != V[j+1])
-//				cout << "Erreur egalité : " << i << "," << j << endl;
+			if(this->VecteursG[i]	!= V[j] || this->VecteursG[i+1] != V[j+1])
+				cout << "Erreur egalité : " << i << "," << j << endl;
 			//fintest
 			cpt	+= V[j];
 			i += 2;
@@ -198,12 +200,14 @@ using namespace std;
 		//check du bon nombre de valeurs à prendre
 		*nbB = V[j];
 		j++;
-		//recup de G
+		//recup de B
 		while(cpt < *nbB){
-			copy(V+j, V+j+2, *B+i);
+//			copy(V+j, V+j+2, this->VecteursB+i);
+			this->VecteursB[i]	= V[j];
+			this->VecteursB[i+1] = V[j+1];
 			//test
-//			if(*B[i]	!= V[j] || *B[i+1] != V[j+1])
-//				cout << "Erreur egalité : " << i << "," << j << endl;
+			if(this->VecteursB[i]	!= V[j] || this->VecteursB[i+1] != V[j+1])
+				cout << "Erreur egalité : " << i << "," << j << endl;
 			//fintest
 			cpt += V[j];
 			i += 2;
@@ -310,7 +314,7 @@ void Image_decomp::readVect(int** Vect, int* largeur, int* hauteur, int* q){
 		//Separation de this->vecteur en vecteurs R/G/B
 		//entier indiquant le nb de val de chaque vecteur
 		int nbR=0, nbG=0, nbB=0;
-		unfuuusion(this->Vecteur,&this->VecteursR,&nbR,&this->VecteursG,&nbG,&this->VecteursB,&nbB);
+		unfuuusion(this->Vecteur,&nbR,&nbG,&nbB);
 		
 		//test affichage de Vect R G et B
 		cout << endl << "nb cases R G B : " <<  nbR << " " << nbG << " " << nbB << endl;
