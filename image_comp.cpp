@@ -111,6 +111,13 @@ using namespace std;
 		
 		//on concatène Vect_out au bout de Vecteur, précédé d'un marqueur indiquant le nombre de valeurs par vecteur
 		concatVect(Vecteur, nbV, Vect_out, &nbOut);
+		cout << "concatVect ";
+		for(int i=0;i<129;i++){
+			cout << Vect_out[i] << " ";
+			if(Vect_out[i]==256)
+				break;
+		}
+		cout << endl;
 		delete Vect_out;
 	}
 
@@ -122,6 +129,9 @@ using namespace std;
 			test+=V1[i];
 			i+=2;
 		}
+		if(V1[i]==256){//si on tombe sur une balise
+			i++;
+		}
 		
 		test=0;
 		int j=0;
@@ -129,9 +139,14 @@ using namespace std;
 			test+=V2[j];
 			j+=2;
 		}
+		//on arrive à la balise
+		if(V2[j]==256){//si on tombe sur une balise
+			j++;
+		}
 		
-		for (int k=0; k<j; k++)
+		for (int k=0; k<j; k++){
 			V1[i+k]=V2[k];
+		}
 		
 		*nb_val1=*nb_val1+*nb_val2;
 	}
@@ -149,7 +164,7 @@ using namespace std;
 			*nb_elem-=V1[size];
 		}
 		//creation du nouveau vecteur
-		*V2 = new int[size];
+		*V2 = new int[size+1]; //1 pour la balise 256 à la fin
 		cpt=0;i=0;
 		while(cpt<*nb_elem){
 			(*V2)[i] = V1[i];
@@ -157,6 +172,9 @@ using namespace std;
 			cpt+=V1[i];
 			i+=2;
 		}
+		(*V2)[i]=256;
+//		cout << "suppr 0 OK" << endl;
+		
 	}
 	
     void Image_comp::fuuusion(int *R, int nbR, int *G, int nbG, int *B, int nbB, int *V){
@@ -168,37 +186,69 @@ using namespace std;
         //RED
         V[0]=nbR;
         while(cpt<nbR){
-            V[i] = R[j];	//qté
-            V[i+1] = R[j+1];//valeur
-            cpt+=R[j];
-            i+=2;
-            j+=2;
+			//cout << R[j] << " "<< R[j+1] << " ";
+			if(R[j]==256){//si on tombe sur la balise
+				V[i] = R[j];
+				i++;
+				j++;
+			} else {
+				V[i] = R[j];	//qté
+				V[i+1] = R[j+1];//valeur
+				cpt+=R[j];
+				i+=2;
+				j+=2;
+			}
         }
+		//on arrive sur une balise 256 que l'on copie
+		V[i] = R[j];
+		i++;
+		j++;
+		
         //GREEN
         V[i]=nbG;
         i++;
         cptVect+=cpt;
         cpt=0; j=0;//réinit du compteur cumulé
         while(cpt<nbG){
-            V[i] = G[j];	//qté
-            V[i+1] = G[j+1];//valeur
-            cpt+=G[j];
-            i+=2;
-            j+=2;
+			if(G[j]==256){//si on tombe sur la balise
+				V[i] = G[j];
+				i++;
+				j++;
+			} else {
+				V[i] = G[j];	//qté
+				V[i+1] = G[j+1];//valeur
+				cpt+=G[j];
+				i+=2;
+				j+=2;
+			}
         }
+		//on arrive sur une balise 256 que l'on copie
+		V[i] = G[j];
+		i++;
+		j++;
         //BLUE
         V[i]=nbB;
         i++;
         cptVect+=cpt;
         cpt=0; j=0;//réinit du compteur cumulé
         while(cpt<nbB){
-            V[i] = B[j];	//qté
-            V[i+1] = B[j+1];//valeur
-            cpt+=B[j];
-            i+=2;
-            j+=2;
-        }
-        
+			if(B[j]==256){//si on tombe sur la balise
+				V[i] = B[j];
+				i++;
+				j++;
+			} else {
+				V[i] = B[j];	//qté
+				V[i+1] = B[j+1];//valeur
+				cpt+=B[j];
+				i+=2;
+				j+=2;
+			}
+		}
+		//on arrive sur une balise 256 que l'on copie
+		V[i] = B[j];
+		i++;
+		j++;
+		
         cptVect+=cpt;
         cout << "Vecteur Final : " << "nb de cases : " << i << endl << "nb de valeurs : " << cptVect << endl;
     }
@@ -354,7 +404,7 @@ using namespace std;
 		this->VecteursR		= new int[2*this->largeur*this->hauteur];
 		this->VecteursG		= new int[2*this->largeur*this->hauteur];
 		this->VecteursB		= new int[2*this->largeur*this->hauteur];
-		this->Vecteur		= new int[6*this->largeur*this->hauteur+3]; //contient les vect RGB + nb de val dans chacun à chaque debut de vect
+		this->Vecteur		= new int[6*this->largeur*this->hauteur+3+(this->largeur*this->hauteur/64)]; //contient les vect RGB + nb de val dans chacun à chaque debut de vect + le nb de balises 256 max : largeur*hauteur/64
         
         this->Q = new int*[8]; //init Matrice Q
         for (int i = 0; i < 8; i++)
@@ -410,10 +460,22 @@ using namespace std;
 					compression8x8(i*8,j*8,this->R,this->VecteursR,&nbR);
 					compression8x8(i*8,j*8,this->G,this->VecteursG,&nbG);
 					compression8x8(i*8,j*8,this->B,this->VecteursB,&nbB);
+					
 				}
+			//test aff
+			cout << "sortie8x8 ";
+			for(int i=0;i<2*this->largeur*this->hauteur;i++){
+				cout << this->VecteursR[i] << " ";
+			}
+			cout << endl;
+			//fin test aff
+			
 
 			//mise bout à bout des 3 vecteurs RGB dans Vecteur, séparé par une case indiquant le nb de valeurs dans chacun
 			fuuusion(this->VecteursR,nbR,this->VecteursG,nbG,this->VecteursB,nbB,this->Vecteur);
+//			for(int i=0;i<6*this->largeur*this->hauteur+3+(this->largeur*this->hauteur/64);i++)
+//				cout << this->Vecteur[i] << " ";
+//			cout << endl;
 		
 			//on ecrit Vecteur dans un fichier
 			writeVect(this->Vecteur);
