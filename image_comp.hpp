@@ -33,7 +33,7 @@ class Image_comp {
 	int *VecteursG = NULL;
 	int *VecteursB = NULL;
 	int *Vecteur	= NULL; // FINAL VECTOR TO WRITE ON DISK
-	int *Vecteur128 = NULL; // Vector compressed from Matrix8x8
+	int *Vecteur129 = NULL; // Vector compressed from Matrix8x8
 	
 	int **Matrice8x8 = NULL;//8x8 matrix we work with
 	int **Q = NULL;         //quantification matrix

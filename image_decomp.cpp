@@ -117,11 +117,15 @@ using namespace std;
 	void Image_decomp::decompression8x8(int x, int y, int **matriceNN, int* Vecteur, int *nbElem){
 		int *Vect_temp = new int[64];
 		int nbIn = 0;
-		//on recupère this->vecteur128 compressé issu de vecteurRGB
-		deconcatVect(Vecteur, nbElem, this->Vecteur128, &nbIn);
+		//on recupère this->Vecteur129 compressé issu de vecteurRGB
+		deconcatVect(Vecteur, nbElem, this->Vecteur129, &nbIn);
+		//test
+		for(int i=0;i<128;i++)
+			cout << this->Vecteur129[i] << " ";
+		//fintest
 		
-		//on decompresse this->Vecteur128
-		decompression_zigzag(this->Vecteur128, Vect_temp, nbIn);
+		//on decompresse this->Vecteur129
+		decompression_zigzag(this->Vecteur129, Vect_temp, nbIn);
 		
 		//on le met dans une matrice avec zigzag et on complete de 0
 		zigzag_inverse(this->Matrice8x8, Vect_temp);
@@ -153,23 +157,20 @@ using namespace std;
 		V1 = V1+i;
 	}
 	
-	void Image_decomp::unfuuusion(int *V, int *nbR, int *nbG, int *nbB){	//Separation de V en R/G/B
+	void Image_decomp::unfuuusion(int *nbR, int *nbG, int *nbB){	//Separation de V en R/G/B
 		
 		int i=0, j=1, cpt=0;//compteur de case V, de cases RGB et compteur cumulé
 
 		//check du bon nombre de valeurs à prendre
-		*nbR = V[0];
+		*nbR = this->Vecteur[0];
 		//recup de R
 		while(cpt < *nbR){
-			//copy(V+j, V+j+2, this->VecteursR+i);
-			this->VecteursR[i]	= V[j];
-			this->VecteursR[i+1] = V[j+1];
-			//test
-			if(this->VecteursR[i] != V[j] || this->VecteursR[i+1] != V[j+1])
-				cout << "Erreur egalité : " << i << "," << j << " " << this->VecteursR[i] << "!=" << V[j] << " et " << this->VecteursR[i+1] << "!=" << V[j+1] << endl;
-			
-			//fintest
-			cpt += V[j];
+//			if(this->VecteursR[i] < 256){
+//				
+//			}
+			this->VecteursR[i]	= this->Vecteur[j];
+			this->VecteursR[i+1] = this->Vecteur[j+1];
+			cpt += this->Vecteur[j];
 			i += 2;
 			j += 2;
 		}
@@ -178,18 +179,13 @@ using namespace std;
 		//réinit de i
 		i = 0;
 		//check du bon nombre de valeurs à prendre
-		*nbG = V[j];
+		*nbG = this->Vecteur[j];
 		j++;
 		//recup de G
 		while(cpt < *nbG){
-			//copy(V+j, V+j+2, this->VecteursG+i);
-			this->VecteursG[i]	= V[j];
-			this->VecteursG[i+1] = V[j+1];
-			//test
-			if(this->VecteursG[i]	!= V[j] || this->VecteursG[i+1] != V[j+1])
-				cout << "Erreur egalité : " << i << "," << j << endl;
-			//fintest
-			cpt	+= V[j];
+			this->VecteursG[i]	= this->Vecteur[j];
+			this->VecteursG[i+1] = this->Vecteur[j+1];
+			cpt	+= this->Vecteur[j];
 			i += 2;
 			j += 2;
 		}
@@ -198,23 +194,17 @@ using namespace std;
 		//réinit de i
 		i = 0;
 		//check du bon nombre de valeurs à prendre
-		*nbB = V[j];
+		*nbB = this->Vecteur[j];
 		j++;
 		//recup de B
 		while(cpt < *nbB){
-//			copy(V+j, V+j+2, this->VecteursB+i);
-			this->VecteursB[i]	= V[j];
-			this->VecteursB[i+1] = V[j+1];
-			//test
-			if(this->VecteursB[i]	!= V[j] || this->VecteursB[i+1] != V[j+1])
-				cout << "Erreur egalité : " << i << "," << j << endl;
-			//fintest
-			cpt += V[j];
+			this->VecteursB[i]	= this->Vecteur[j];
+			this->VecteursB[i+1] = this->Vecteur[j+1];
+			cpt += this->Vecteur[j];
 			i += 2;
 			j += 2;
 		}
-		
-		cout << "unfuuusion fait" << endl;
+		cout << "unfuuusion fait " << endl;
 	}
 
 void Image_decomp::readVect(int** Vect, int* largeur, int* hauteur, int* q){
@@ -234,8 +224,6 @@ void Image_decomp::readVect(int** Vect, int* largeur, int* hauteur, int* q){
 		for(i = 0; i < 6*(*largeur)*(*hauteur)+3; i++){
 			if (!fscanf(vector, "%d ", *Vect+i))
 				break;
-			if(i%2==0 && *(*Vect+i)!=0)
-				cout << *(*Vect+i) << " " << *(*Vect+i+1) << " ";
 		}
 		cout << endl;
 	}
@@ -266,7 +254,7 @@ void Image_decomp::readVect(int** Vect, int* largeur, int* hauteur, int* q){
 			this->Q[i] = new int[8];
 		}
 		
-		this->Vecteur128	= new int[128];
+		this->Vecteur129	= new int[129];
 		this->VecteursR		= new int[2*this->largeur*this->hauteur];
 		this->VecteursG		= new int[2*this->largeur*this->hauteur];
 		this->VecteursB		= new int[2*this->largeur*this->hauteur];
@@ -304,7 +292,7 @@ void Image_decomp::readVect(int** Vect, int* largeur, int* hauteur, int* q){
 		delete this->VecteursG;
 		delete this->VecteursB;
 		delete this->Vecteur;
-		delete this->Vecteur128;
+		delete this->Vecteur129;
 
 		cout << "destruction faite\n";
 		}
@@ -314,36 +302,7 @@ void Image_decomp::readVect(int** Vect, int* largeur, int* hauteur, int* q){
 		//Separation de this->vecteur en vecteurs R/G/B
 		//entier indiquant le nb de val de chaque vecteur
 		int nbR=0, nbG=0, nbB=0;
-		unfuuusion(this->Vecteur,&nbR,&nbG,&nbB);
-		
-		//test affichage de Vect R G et B
-		cout << endl << "nb cases R G B : " <<  nbR << " " << nbG << " " << nbB << endl;
-		int cpt1=0;
-		int cpt2=0;
-		cout << endl << "Vecteur R : " << endl;
-		while(cpt2<nbR){
-			cout << this->VecteursR[cpt1] << " " << this->VecteursR[cpt1] << " ";
-			cpt2+=this->VecteursR[cpt1];
-			cpt1+=2;
-		}
-		cpt1=0;
-		cpt2=0;
-		cout << endl << "Vecteur G : " << endl;
-		while(cpt2<nbG){
-			cout << this->VecteursG[cpt1] << " " << this->VecteursG[cpt1] << " ";
-			cpt2+=this->VecteursG[cpt1];
-			cpt1+=2;
-		}
-		cpt1=0;
-		cpt2=0;
-		cout << endl << "Vecteur B : " << endl;
-		while(cpt2<nbB){
-			cout << this->VecteursB[cpt1] << " " << this->VecteursB[cpt1] << " ";
-			cpt2+=this->VecteursB[cpt1];
-			cpt1+=2;
-		}
-
-		//fin test affichage
+		unfuuusion(&nbR,&nbG,&nbB);
 		
 		//repartition de chaque vecteursRGB dans des vecteurs 88 puis mise en matrice et traitement
 		for(int i=0;i<this->largeur/8;i++)
@@ -352,6 +311,31 @@ void Image_decomp::readVect(int** Vect, int* largeur, int* hauteur, int* q){
 				decompression8x8(i*8,j*8,this->G,this->VecteursG,&nbG);
 				decompression8x8(i*8,j*8,this->B,this->VecteursB,&nbB);
 			}
+		//test affichage de R G et B
+//		for(int i=0;i<this->largeur;i++){
+//			for(int j=0;i<hauteur;j++){
+//				cout << this->R[i][j] << " ";
+//			}
+//			cout << endl;
+//		}
+//		cout << endl;
+//		for(int i=0;i<this->largeur;i++){
+//			for(int j=0;i<hauteur;j++){
+//				cout << this->G[i][j] << " ";
+//			}
+//			cout << endl;
+//		}
+//		cout << endl;
+//		for(int i=0;i<this->largeur;i++){
+//			for(int j=0;i<hauteur;j++){
+//				cout << this->B[i][j] << " ";
+//			}
+//			cout << endl;
+//		}
+//		cout << endl;
+		//fin test affichage
+		
+
 		
 		//ecriture de la matrice dans un fichier
 		//Matrice --> Fichier

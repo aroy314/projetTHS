@@ -101,12 +101,12 @@ using namespace std;
 		
 		int *Vect_temp = new int[64];
 		zigzag(this->Matrice8x8, Vect_temp);
-		compression_zigzag(Vect_temp, this->Vecteur128, &nbOut);
+		compression_zigzag(Vect_temp, this->Vecteur129, &nbOut);
 		delete Vect_temp;
 		
 		//suppression des 0 et raccourcissement du vecteur, le tout dans Vect_out
 		int *Vect_out = NULL;
-		suppression_zeros(this->Vecteur128, &Vect_out, &nbOut);//nbOut doit réduire si on enlève les 0
+		suppression_zeros(this->Vecteur129, &Vect_out, &nbOut);//nbOut doit réduire si on enlève les 0
 		//on a le resultat final dans Vect_out
 		
 		//on concatène Vect_out au bout de Vecteur, précédé d'un marqueur indiquant le nombre de valeurs par vecteur
@@ -350,7 +350,7 @@ using namespace std;
             this->Q[i] = new int[8];
         }
 		
-		this->Vecteur128	= new int[128];
+		this->Vecteur129	= new int[129];
 		this->VecteursR		= new int[2*this->largeur*this->hauteur];
 		this->VecteursG		= new int[2*this->largeur*this->hauteur];
 		this->VecteursB		= new int[2*this->largeur*this->hauteur];
@@ -391,7 +391,7 @@ using namespace std;
 		delete this->VecteursG;
 		delete this->VecteursB;
 		delete this->Vecteur;
-		delete this->Vecteur128;
+		delete this->Vecteur129;
 
 		cout << "destruction faite\n";
 	}

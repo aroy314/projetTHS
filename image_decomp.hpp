@@ -33,7 +33,7 @@ class Image_decomp {
 	int *VecteursG = NULL;
 	int *VecteursB = NULL;
 	int *Vecteur	= NULL; // FINAL VECTOR TO WRITE ON DISK
-	int *Vecteur128 = NULL; // Vector compressed from Matrix8x8
+	int *Vecteur129 = NULL; // Vector compressed from Matrix8x8
 	
 	int **Matrice8x8 = NULL;//8x8 matrix we work with
 	int **Q = NULL;         //quantification matrix
@@ -52,7 +52,7 @@ class Image_decomp {
 	
 	void deconcatVect(int *V1, int *nb_val1, int *V2, int *nb_val2);
 	
-	void unfuuusion(int *V, int *nbR, int *nbG, int *nbB);
+	void unfuuusion(int *nbR, int *nbG, int *nbB);
 	
 	void decompression_zigzag (int *V1, int *V2, const int nb_elem);
 	
